@@ -152,6 +152,8 @@ The covariance structure of a \emph{stochastic process} is represented by a symm
 
 \emph{Gaussian Processes} first appeared in machine learning research as the limiting case of Bayesian inference performed on neural networks with infinitely many neurons in the hidden layers \citet{Neal:1996:BLN:525544}. It was noted by the author that "there may be simpler ways to do inference in this case". Although their inception in the machine learning community is recent, they were studied in statistics/mathematics community as special cases of \emph{Stochastic Processes}. The reader is requested to refer to \cite{Rasmussen:2005:GPM:1162254} for an in depth treatment of Gaussian Processes in Machine Learning.  
 
+\subsection{Formulation}
+
 \begin{eqnarray}
       \mathbf{x} & \in & \mathbb{R}^d \\
       \mathbf{X} & = & (\mathbf{x}_1, \mathbf{x}_2, \cdots, \mathbf{x}_N) \\
@@ -159,7 +161,13 @@ The covariance structure of a \emph{stochastic process} is represented by a symm
       y & = & f(\mathbf{x}) + \epsilon  \\
       f & \sim & \mathcal{GP}(m(\mathbf{x}), K(\mathbf{x},\mathbf{x}'))  \\
       \left(\mathbf{y} \ \ \mathbf{f_*} \right)^\intercal & \sim & 
-\mathcal{N}\left(\mathbf{0}, \left[ \begin{array}{ccc} \mathbf{K}(\mathbf{X}, \mathbf{X}) + \sigma^{2} \mathbf{I} & \mathbf{K}(\mathbf{X}, \mathbf{X_*}) \\ \mathbf{K}(\mathbf{X_*}, \mathbf{X}) & \mathbf{K}(\mathbf{X_*}, \mathbf{X_*}) \end{array} \right ] \right) \\
+\mathcal{N}\left(\mathbf{0}, \left[ \begin{array}{cc} \mathbf{K}(\mathbf{X}, \mathbf{X}) + \sigma^{2} \mathbf{I} & \mathbf{K}(\mathbf{X}, \mathbf{X_*}) \\ \mathbf{K}(\mathbf{X_*}, \mathbf{X}) & \mathbf{K}(\mathbf{X_*}, \mathbf{X_*}) \end{array} \right ] \right)
+\end{eqnarray}
+
+
+\subsection{Inference and Predictions}
+
+\begin{eqnarray}
       \mathbf{f_*}|\mathbf{X},\mathbf{y},\mathbf{X_*} & \sim & \mathcal{N}(\mathbf{\bar{f}_*}, \Sigma_*)  \label{eq:posterior} \\
       \mathbf{\bar{f}_*} & = & \mathbb{E}[\mathbf{f_*}|\mathbf{X},\mathbf{y},\mathbf{X_*}]  \\
       & = & K(\mathbf{X_*},\mathbf{X})^\intercal [K(\mathbf{X},\mathbf{X}) + \sigma^{2} \mathbf{I}]^{-1} \mathbf{y} \\
@@ -169,13 +177,13 @@ The covariance structure of a \emph{stochastic process} is represented by a symm
 
 \subsection{Kernel Functions}
 
-For the success of a Gaussian Process model an appropriate choice of kernel function is paramount. It is important to note that every kernel function generates a \emph{Reproducing Kernel Hilbert Space} (RKHS) of functions, and the nature of the kernel dictates what restrictions exist on the functions belonging to its RKHS. The interested reader is suggested to refer to \cite{Berlinet2004} for a thorough treatment on RKHS and the rich theory behind them.
+For the success of a Gaussian Process model an appropriate choice of kernel function is paramount. It is important to note that every kernel function generates a \emph{Reproducing Kernel Hilbert Space} (RKHS) of functions, and the nature of the kernel dictates what restrictions exist on the functions belonging to its RKHS. The Gaussian Process model essentially uses basis functions from this RKHS to represent the unknown function. The interested reader is suggested to refer to \cite{Berlinet2004} for a thorough treatment on RKHS and the rich theory behind them.
 
 Some common kernel functions used in machine learning are.
 
 \subsubsection{Radial Basis Function (RBF)}
 
-The RBF kernel is the most commonly used kernel in machine learning, in its core it 
+The RBF kernel is the most commonly used kernel in machine learning, in its core it encodes the idea of \emph{smoothness} because functions drawn from its Hilbert space are infinitely differentiable. The RBF kernel is also an example of a \emph{stationary} kernel i.e. its value depends only on $||\mathbf{x} - \mathbf{y}||$. The quantity $\sigma$ is known as the characteristic \emph{length scale} of this kernel, it is a free parameter (also known as hyper-parameter) which must be determined by the modeller, refer to section \ref{sec:hyp} on how suitable values of kernel hyper-parameters.
 
 \begin{equation}
     K(\mathbf{x}, \mathbf{y}) = \frac{1}{2} exp(-||\mathbf{x} - \mathbf{y}||^2/\sigma^2)
@@ -191,7 +199,7 @@ The RBF kernel is the most commonly used kernel in machine learning, in its core
 
 
 
-\subsection{Optimizing Hyper-parameters}
+\subsection{Optimizing Hyper-parameters} \label{sec:hyp}
 
 
 
