@@ -112,7 +112,7 @@
     We aim to improve the state of the art of \emph{One Step Ahead}(OSA) prediction of the $D_{st}$ geomagnetic activity index. In the domain of OSA prediction, it is well known that $D_{st}(t)$ values correlate strongly with values one hour in the past (i.e. $D_{st}(t-1)$). While a number of forecasting models have been proposed and compared, none of them have been compared with the \emph{Persistence} model to quantify their performance improvements above this most trivial of predictors. In this study we train Gaussian Process regression models for One Step Ahead (OSE) prediction of the Disturbance Storm Time ($D_{st}$) geomagnetic index. We propose three variants of the Gaussian Process model.
     \begin{enumerate*}
       \item Gaussian Process Auto regressive GP-AR 
-      \item Gaussian Process Auto regressive with eXogenous inputs GP-NARX. 
+      \item Gaussian Process Auto regressive with eXogenous inputs GP-ARX. 
     \end{enumerate*}
     We compare the performance of these models with the current state of the art in one step ahead $D_{st}$ prediction on a set of 
     63 benchmark storms from 1998-2006. The proposed Gaussian Process models not only outperform the rest but also the \emph{Persistence} model.
@@ -147,7 +147,7 @@ We restrict ourselves to the supervised learning problem in statistics, which is
  f & \sim & \mathcal{GP}(m(\mathbf{x}), K(\mathbf{x},\mathbf{x}'))
 \end{eqnarray}
 
-The covariance structure of a \emph{stochastic process} is represented by a symmetric positive definite function as given in \ref{eq:kern}, by \emph{Kolmogorov's extension theorem} (see \citet{tao2011introduction}), the function $K: \mathbb{R}^d \times \mathbb{R}^d \rightarrow \mathbb{R}$ uniquely determines the process. Therefore this covariance function (also called kernel function in machine learning) helps us to specify the class of functions represented by the process.
+The covariance structure of a \emph{stochastic process} is represented by a symmetric positive definite function as given in \ref{eq:kern}. By \emph{Kolmogorov's extension theorem} (\citet{tao2011introduction}), the function $K: \mathbb{R}^d \times \mathbb{R}^d \rightarrow \mathbb{R}$ uniquely determines the process. Therefore this covariance function (also called kernel function in machine learning) helps us to specify the class of functions represented by the process.
 
 
 \emph{Gaussian Processes} first appeared in machine learning research as the limiting case of Bayesian inference performed on neural networks with infinitely many neurons in the hidden layers \citet{Neal:1996:BLN:525544}. It was noted by the author that "there may be simpler ways to do inference in this case". Although their inception in the machine learning community is recent, they were studied in statistics/mathematics community as special cases of \emph{Stochastic Processes}. The reader is requested to refer to \cite{Rasmussen:2005:GPM:1162254} for an in depth treatment of Gaussian Processes in Machine Learning.  
@@ -199,18 +199,20 @@ The polynomial kernel is also a common kernel function employed in research, it 
 \end{equation}
 
 
+In this study, we construct Gaussian Process models with polynomial kernels for \emph{one step ahead} prediction of the $D_{st}$ index. 
 
 
 \subsection{Optimizing Hyper-parameters} \label{sec:hyp}
 
+With kernel based prediction models one always encounters the crucial question of what values to assign to the kernel hyper-parameters. This is known as \emph{model tuning} in kernel research parlance. There are many methods to perform \emph{model tuning}, one generally formulates an objective function and aims to optimize it in terms of the hyper-parameters. Common examples of objective functions include data likelihood, cross validation performance scores and validation set performance scores among others. Since the objective function for the model tuning problem is non-convex and non-smooth in general, gradient free approaches are used to find approximate values of local optima.
 
-
+The simplest way to perform model tuning is called \emph{grid search} which entails evaluating the above objective function on a fixed grid which is constructed by making a list of values for each hyper-parameter and taking the combinations of all such values. There are more sophisticated methods for \emph{model tuning} such as \emph{coupled simulated annealing} (\citet{Xavier-De-Souza2010}) and \emph{simplex search} (\citet{Nelder1965}) but they are computationally more expensive. In this study we chose \emph{grid search} as the model tuning routine. 
 
 \section{One Step Ahead Prediction}
 
 
 
-\subsection{Gaussian Process Nonlinear Auto-Regressive (NAR)}
+\subsection{Gaussian Process Nonlinear Auto-Regressive (GP-AR)}
 
 The input vector $x_t$ at each time step is the $p$ order time history of $D_{st}$.
   \begin{eqnarray}
@@ -219,7 +221,7 @@ The input vector $x_t$ at each time step is the $p$ order time history of $D_{st
     f(x_t) & \sim & \mathcal{GP}(m(x_t), K(x_t,x_s)) \label{eq:DstGP}
 \end{eqnarray}
 
-\subsection{Gaussian Process Nonlinear Auto-Regressive with eXogenous inputs (NARX)}
+\subsection{Gaussian Process Nonlinear Auto-Regressive with eXogenous inputs (GP-ARX)}
 
 Solar wind velocity $V$ and interplanetary magnetic field $B_z$ recorded at the ACE satellite are used as the exogenous inputs of the model, along with the time history of $D_{st}$.
     
