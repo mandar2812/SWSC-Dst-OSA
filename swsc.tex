@@ -111,7 +111,7 @@
    \abstract{
     We aim to improve the state of the art of \emph{One Step Ahead}(OSA) prediction of the $D_{st}$ geomagnetic activity index. In the domain of OSA prediction, it is well known that $D_{st}(t)$ values correlate strongly with values one hour in the past (i.e. $D_{st}(t-1)$). While a number of forecasting models have been proposed and compared, none of them have been compared with the \emph{Persistence} model to quantify their performance improvements above this most trivial of predictors. In this study we train Gaussian Process regression models for One Step Ahead (OSE) prediction of the Disturbance Storm Time ($D_{st}$) geomagnetic index. We propose three variants of the Gaussian Process model.
     \begin{enumerate*}
-      \item Gaussian Process Nonlinear Auto regressive GP-NAR 
+      \item Gaussian Process Auto regressive GP-AR 
       \item Gaussian Process Auto regressive with eXogenous inputs GP-NARX. 
     \end{enumerate*}
     We compare the performance of these models with the current state of the art in one step ahead $D_{st}$ prediction on a set of 
@@ -191,6 +191,8 @@ The RBF kernel is the most commonly used kernel in machine learning, in its core
     
     
 \subsubsection{Polynomial}
+
+The polynomial kernel is also a common kernel function employed in research, it has two hyper-parameters the degree $d$ and an intercept $b$. The polynomial kernel formulates the function approximation in terms of polynomial expansions of the input dimensions $\mathbf{x}$, more specifically it considers all monomial combination of the input dimensions up to degree $d$. When $d = 1$ it corresponds to a Bayesian linear regression model. 
 
 \begin{equation}
     K(\mathbf{x}, \mathbf{y}) = (\mathbf{x}^\intercal \mathbf{y} + b)^d 
