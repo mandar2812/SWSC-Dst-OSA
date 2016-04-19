@@ -70,6 +70,7 @@
 \usepackage[backref]{hyperref}
 \usepackage{url}
 \usepackage[inline]{enumitem}
+\usepackage{verbatim}
 %%    This version assumes using bibtex with the swsc bibliography style file
 \bibliographystyle{swsc.bst}
 
@@ -130,6 +131,21 @@
 
 \section{Introduction}
 
+The Sun is the principal driver of Space Weather, the steady solar wind and intermittent bursts of hot plasma from its corona (Coronal Mass Ejections \emph{CME}) are the causes of several observed phenomena in the Earths Magnetosphere such as but not limited to \emph{Aurora Borealis}, \emph{Aurora Australis}, \emph{Van Allen Currents}, geomagnetic storms etc.
+
+Although the qualitative bifurcation of these phenomena is well understood and each has been studied in depth, the magnetosphere's dynamics and its associated solar wind driver form a complex nonlinear coupled dynamical system. It is therefore not only instructive but also greatly simplifying to use representative indices to quantify the state of geomagnetic activity.
+
+Geomagnetic indices come in various forms, they may take continuous or discreet values. Their values are often calculated by averaging or combining a number of readings taken by instruments around the Earth. Each geomagnetic index is a proxy for a particular kind of phenomena. Some popular indices are.
+
+\begin{enumerate}
+    \item $K_p$: The Kp-index is a discreet valued global geomagnetic storm index and is based on 3 hour measurements of the K-indices, for a given value, for each of the past days. The K-index itself is a three hour long quasi-logarithmic local index of the geomagnetic activity, relative to a calm day curve for the given location.
+    
+    \item AE: The Auroral Electrojet Index, AE, is designed to provide a global, quantitative measure of auroral zone magnetic activity produced by enhanced Ionospheric currents flowing below and within the auroral oval.
+    
+    \item $D_{st}$: A continuous hourly index which measures the weakening of the Earths magnetic field due to ring currents. 
+\end{enumerate}
+
+We focus on prediction of the hourly $D_{st}$ index which is an important problem because $D_{st}$ is a straight forward indicator of the occurrence of geomagnetic storms. More specifically we focus on the \emph{one step ahead} prediction of $D_{st}$ because it is the first step towards building long term predictions of geomagnetic response of the Earth to changing space weather conditions and because it has been the subject of several modeling efforts in the past.  
 
 
 We use the hourly resolution Omni data set (see \cite{OmniPaper}) as extracted from NASA/GSFC's OMNI data set through OMNIWeb.
@@ -137,8 +153,10 @@ We use the hourly resolution Omni data set (see \cite{OmniPaper}) as extracted f
   
 \section{Methodology: Gaussian Process}
 
-We restrict ourselves to the supervised learning problem in statistics, which is inductive. In other words, we aim to model functions of single or multiple variables (i.e. fields $f(\mathbf{x}), \ x \in \mathbb{R}^d $), using a set of labeled data points ${(\mathbf{x}_i, y_i), \forall i \in 1 \cdots N}$. These problems have been studied extensively in statistics over the past century.
 
+\emph{Gaussian Processes} first appeared in machine learning research as the limiting case of Bayesian inference performed on neural networks with infinitely many neurons in the hidden layers \citet{Neal:1996:BLN:525544}. It was noted by the author that "there may be simpler ways to do inference in this case". Although their inception in the machine learning community is recent, they were studied in statistics/mathematics community as special cases of \emph{Stochastic Processes}. The reader is requested to refer to \cite{Rasmussen:2005:GPM:1162254} for an in depth treatment of Gaussian Processes in Machine Learning.
+
+\begin{comment}
 \emph{Stochastic Processes} extend the idea of probability distributions to the space of functions of a single or multiple variables. A \emph{Gaussian Process} is a stochastic process whose finite dimensional distributions are multivariate Gaussian \ref{eq:sto}.
 \vspace{-\baselineskip}
 \begin{eqnarray}
@@ -149,10 +167,13 @@ We restrict ourselves to the supervised learning problem in statistics, which is
 
 The covariance structure of a \emph{stochastic process} is represented by a symmetric positive definite function as given in \ref{eq:kern}. By \emph{Kolmogorov's extension theorem} (\citet{tao2011introduction}), the function $K: \mathbb{R}^d \times \mathbb{R}^d \rightarrow \mathbb{R}$ uniquely determines the process. Therefore this covariance function (also called kernel function in machine learning) helps us to specify the class of functions represented by the process.
 
-
-\emph{Gaussian Processes} first appeared in machine learning research as the limiting case of Bayesian inference performed on neural networks with infinitely many neurons in the hidden layers \citet{Neal:1996:BLN:525544}. It was noted by the author that "there may be simpler ways to do inference in this case". Although their inception in the machine learning community is recent, they were studied in statistics/mathematics community as special cases of \emph{Stochastic Processes}. The reader is requested to refer to \cite{Rasmussen:2005:GPM:1162254} for an in depth treatment of Gaussian Processes in Machine Learning.  
+\end{comment}
+  
 
 \subsection{Formulation}
+
+We restrict ourselves to the supervised learning problem in statistics, which is inductive. In other words, we aim to model functions of single or multiple variables (i.e. fields $f(\mathbf{x}), \ x \in \mathbb{R}^d $), using a set of labeled data points ${(\mathbf{x}_i, y_i), \forall i \in 1 \cdots N}$. These problems have been studied extensively in statistics over the past century.
+
 
 \begin{eqnarray}
       \mathbf{x} & \in & \mathbb{R}^d \\
