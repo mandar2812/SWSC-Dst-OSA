@@ -153,61 +153,97 @@ We use the hourly resolution Omni data set (see \cite{OmniPaper}) as extracted f
   
 \section{Methodology: Gaussian Process}
 
+\emph{Gaussian Processes} first appeared in machine learning research as the limiting case of Bayesian inference performed on neural networks with infinitely many neurons in the hidden layers \citet{Neal:1996:BLN:525544}. Although their inception in the machine learning community is recent, their origins can be traced back to the geo-statistics research community where they are known as \emph{Kriging} methods (\citet{krige1951statistical}). In pure mathematics area \emph{Gaussian Processes} have been studied extensively and their existence was first proven by Kolmogorov's extension theorem (\citet{tao2011introduction}). The reader is requested to refer to \cite{Rasmussen:2005:GPM:1162254} for an in depth treatment of Gaussian Processes in Machine Learning.
 
-\emph{Gaussian Processes} first appeared in machine learning research as the limiting case of Bayesian inference performed on neural networks with infinitely many neurons in the hidden layers \citet{Neal:1996:BLN:525544}. It was noted by the author that "there may be simpler ways to do inference in this case". Although their inception in the machine learning community is recent, they were studied in statistics/mathematics community as special cases of \emph{Stochastic Processes}. The reader is requested to refer to \cite{Rasmussen:2005:GPM:1162254} for an in depth treatment of Gaussian Processes in Machine Learning.
 
-\begin{comment}
-\emph{Stochastic Processes} extend the idea of probability distributions to the space of functions of a single or multiple variables. A \emph{Gaussian Process} is a stochastic process whose finite dimensional distributions are multivariate Gaussian \ref{eq:sto}.
-\vspace{-\baselineskip}
+A \emph{Gaussian Process} is a stochastic process $f(\mathbf{x}), \ \mathbf{x} \in \mathbb{R}^d$ whose finite dimensional distributions over a set of points $\mathbf{x}_1, \cdots, \mathbf{x}_n$ are multivariate Gaussian. Formally this is expressed as.
+
 \begin{eqnarray}
- \left(f(\mathbf{x}_1), f(\mathbf{x}_2) \cdots f(\mathbf{x}_N) \right)^T & \sim & \mathcal{N}\left(\mathbf{\mu}, \mathbf{\Lambda} \right) \label{eq:sto} \\
- \mathbf{\Lambda}_{ij} & = & K(\mathbf{x}_i, \mathbf{x}_j) \label{eq:kern}\\
- f & \sim & \mathcal{GP}(m(\mathbf{x}), K(\mathbf{x},\mathbf{x}'))
+ \mathbf{f} & = & \left( \begin{array}{c} f(\mathbf{x}_1) \\ f(\mathbf{x}_2) \\ \vdots \\ f(\mathbf{x}_n) \end{array} \right) \\
+ \vspace{2\baselineskip}
+ \mathbf{f} | \mathbf{x}_1, \cdots, \mathbf{x}_n & \sim & \mathcal{N}\left( \mathbf{\mu}, \mathbf{\Lambda} \right)  \\
+ \vspace{2\baselineskip}
+ p( \mathbf{f} \ | \ \mathbf{x}_1, \cdots, \mathbf{x}_n) & = & \frac{1}{(2\pi)^{n/2} det(\mathbf{\Lambda})^{1/2}} exp \left(-\frac{1}{2} (\mathbf{f} - \mathbf{\mu})^T \mathbf{\Lambda}^{-1} (\mathbf{f} - \mathbf{\mu}) \right) \label{eq:sto}
 \end{eqnarray}
 
-The covariance structure of a \emph{stochastic process} is represented by a symmetric positive definite function as given in \ref{eq:kern}. By \emph{Kolmogorov's extension theorem} (\citet{tao2011introduction}), the function $K: \mathbb{R}^d \times \mathbb{R}^d \rightarrow \mathbb{R}$ uniquely determines the process. Therefore this covariance function (also called kernel function in machine learning) helps us to specify the class of functions represented by the process.
+From equation \ref{eq:sto}, one can observe that in order to uniquely define the distribution of the process, it is required to specify the mean vector $\mathbf{\mu}$ and the covariance matrix $\mathbf{\Lambda}$. For this probability density to be valid, there is a further requirements imposed on $\mathbf{\Lambda}$: 
 
-\end{comment}
-  
+\begin{enumerate}
+      \item Symmetry: $\mathbf{\Lambda}_{ij} = \mathbf{\Lambda}_{ij} \ \forall i,j \in {1, \cdots, n} $ 
+      \item Positive Semi-definiteness: $\mathbf{y}^T \mathbf{\Lambda} \mathbf{y} \geq 0 \ \forall \mathbf{y} \in \mathbb{R}^n$  
+\end{enumerate}
 
-\subsection{Formulation}
-
-We restrict ourselves to the supervised learning problem in statistics, which is inductive. In other words, we aim to model functions of single or multiple variables (i.e. fields $f(\mathbf{x}), \ x \in \mathbb{R}^d $), using a set of labeled data points ${(\mathbf{x}_i, y_i), \forall i \in 1 \cdots N}$. These problems have been studied extensively in statistics over the past century.
-
+Inspecting the individual elements of $\mathbf{\mu}$ and $\mathbf{\Lambda}$, we realise that they take the following form.
 
 \begin{eqnarray}
-      \mathbf{x} & \in & \mathbb{R}^d \\
-      \mathbf{X} & = & (\mathbf{x}_1, \mathbf{x}_2, \cdots, \mathbf{x}_N) \\
-      \mathbf{y} & = & (y_1, y_2, \cdots, y_N) \\
+      \mu_i & = & \mathbb{E}[f(\mathbf{x}_i)] := m(\mathbf{x}_i) \\
+      \Lambda_{ij} & = & \mathbb{E}[(f(\mathbf{x}_i) - \mu_i)(f(\mathbf{x}_j) - \mu_j)] := K(\mathbf{x}_i, \mathbf{x}_j)
+\end{eqnarray}
+
+Here $\mathbb{E}$ denotes the expectation (average). The elements of $\mathbf{\mu}$ and $\mathbf{\Lambda}$ are expressed as functions $m(\mathbf{x}_i)$ and $K(\mathbf{x}_i, \mathbf{x}_j)$ of the inputs $\mathbf{x}_i,\ \mathbf{x}_j$. Specifying the functions $m(\mathbf{x})$ and $K(\mathbf{x}, \mathbf{x}')$ completely specifies each element of $\mathbf{\mu}$ and $\mathbf{\Lambda}$ and subsequently the finite dimensional distribution of $\mathbf{f} | \mathbf{x}_1, \cdots, \mathbf{x}_n $. In machine learning literature \emph{Gaussian Processes} are represented using the following notation.
+
+\begin{equation}
+    f(\mathbf{x}) \sim \mathcal{GP}(m(\mathbf{x}), K(\mathbf{x}, \mathbf{x}'))
+\end{equation}
+
+In most practical applications of \emph{Gaussian Processes} the mean function is often defined as $m(\mathbf{x}) = 0$, which is not unreasonable if the data is standardized to have zero mean. The central design issue now becomes choice of the function $K(\mathbf{x}, \mathbf{x}')$. The same constraints that apply to $\mathbf{\Lambda}$ also apply to the function $K(.,.)$. In machine learning, these symmetric positive definite functions of two variables are known as \emph{kernels}. Kernel based methods are applied extensively in data analysis i.e. regression, clustering, classification, density estimation (see \citet{Scholkopf:2001:LKS:559923}, \citet{hofmann2008}).
+
+\subsection{Gaussian Process Regression: Formulation}
+
+\begin{eqnarray}
+  \mathbf{X} & = & \left( \begin{array}{c} \mathbf{x}^{T}_1 \\ \mathbf{x}^{T}_2 \\ \vdots \\ \mathbf{x}^{T}_n \end{array} \right)_{n \times d} \label{eq:feat} \\
+  \vspace{2\baselineskip}
+  \mathbf{y} & = & \left( \begin{array}{c} y_1 \\ y_2 \\ \vdots \\ y_N \end{array} \right) _{n \times 1} \label{eq:labels}
+\end{eqnarray}
+
+We start with a set of labeled data points $ {(\mathbf{x}_i, y_i): \forall i \in 1 \cdots N, \ \mathbf{x}_i \in \mathbb{R}^d \ y_i \in \mathbb{R}} $ condensed into a data matrix $\mathbf{X}$ and response vector $\mathbf{y}$ in equations \ref{eq:feat} and \ref{eq:labels}. The values $y_i$ are assumed to be measurements of an unknown function $f(\mathbf{x}_i)$ corrupted by an independent and identically distributed zero mean Gaussian noise. The \emph{Gaussian Process} regression framework is the defined by the following components.
+
+\begin{eqnarray}
       y & = & f(\mathbf{x}) + \epsilon  \\
-      f & \sim & \mathcal{GP}(m(\mathbf{x}), K(\mathbf{x},\mathbf{x}'))  \\
-      \left(\mathbf{y} \ \ \mathbf{f_*} \right)^\intercal & \sim & 
-\mathcal{N}\left(\mathbf{0}, \left[ \begin{array}{cc} \mathbf{K}(\mathbf{X}, \mathbf{X}) + \sigma^{2} \mathbf{I} & \mathbf{K}(\mathbf{X}, \mathbf{X_*}) \\ \mathbf{K}(\mathbf{X_*}, \mathbf{X}) & \mathbf{K}(\mathbf{X_*}, \mathbf{X_*}) \end{array} \right ] \right)
+      \epsilon & \sim & \mathcal{N}(0, \sigma^2) \\
+      f(\mathbf{x}) & \sim & \mathcal{GP}(m(\mathbf{x}), K(\mathbf{x},\mathbf{x}')) 
 \end{eqnarray}
 
 
 \subsection{Inference and Predictions}
 
+Our aim is to generate infer the function $f(\mathbf{x})$ from the noisy training data and generate predictions $f(\mathbf{x}^{*}_i)$ for a set of test points $ {\mathbf{x}^{*}_i : \forall i \in 1, \cdots, m} $. We start from equation \ref{eq:sto} and use it to construct the distribution of $f(\mathbf{x})$ over the training and test points, how ever since we have noisy measurements of $f$ over the training data, we add the noise variance $\sigma^2$ to the variance of $f$ as shown in \ref{eq:dist}.
+
 \begin{eqnarray}
-      \mathbf{f_*}|\mathbf{X},\mathbf{y},\mathbf{X_*} & \sim & \mathcal{N}(\mathbf{\bar{f}_*}, \Sigma_*)  \label{eq:posterior} \\
-      \mathbf{\bar{f}_*} & = & \mathbb{E}[\mathbf{f_*}|\mathbf{X},\mathbf{y},\mathbf{X_*}]  \\
-      & = & K(\mathbf{X_*},\mathbf{X})^\intercal [K(\mathbf{X},\mathbf{X}) + \sigma^{2} \mathbf{I}]^{-1} \mathbf{y} \\
-      \Sigma_* & = & K(\mathbf{X_*}, \mathbf{X_*}) - K(\mathbf{X_*},\mathbf{X})^\intercal \left(K(\mathbf{X},\mathbf{X}) + \sigma^{2} \mathbf{I}\right)^{-1}K(\mathbf{X},\mathbf{X_*})
+    \mathbf{X}_* & = & \left( \begin{array}{c} (\mathbf{x}^{*}_1)^T \\ (\mathbf{x}^{*}_2)^T \\ \vdots \\ (\mathbf{x}^{*}_m)^T \end{array} \right)_{m \times d} \\
+    \mathbf{f}_* & = & \left( \begin{array}{c} f(\mathbf{x^{*}_1}) \\ f(\mathbf{x^{*}_2}) \\ \vdots \\ f(\mathbf{x^{*}_m}) \end{array} \right)_{m \times 1} \\
+     \vspace{4\baselineskip}
+    \left( \begin{array}{c} \mathbf{y} \\ \mathbf{f_*} \end{array} \right) | \ \ \mathbf{X}, \mathbf{X}_* & \sim & 
+    \mathcal{N}\left(\mathbf{0}, \left[ \begin{array}{cc} \mathbf{K} + \sigma^{2} \mathbf{I} & \mathbf{K}_{*} \\ \mathbf{K}_{*}^T & \mathbf{K}_{**} \end{array} \right ] \right) \label{eq:dist}
 \end{eqnarray}
 
+In equation \ref{eq:dist} the block matrix components of the $n+m \times n+m$ covariance matrix have the following structure.
+
+\begin{enumerate}
+      \item $\mathbf{I}$: The $n \times n$ identity matrix.
+      \item $\mathbf{K} = [K(\mathbf{x}_i, \mathbf{x}_j)], \ i,j \in 1,\cdots,n$ : Kernel matrix constructed from all couples of the training data.
+      \item $\mathbf{K}_{*} = [K(\mathbf{x}_i, \mathbf{x}^{*}_j)], \ i \in 1,\cdots,n ; j \in 1,\cdots,m$ : Cross kernel matrix constructed from all couples between training and test data points.
+      \item $\mathbf{K}_{**} = [K(\mathbf{x}^{*}_i, \mathbf{x}^{*}_j)], \ i,j \in 1,\cdots,m$: Kernel matrix constructed from all couples of the test data.
+\end{enumerate}
+
+With the multivariate normal distribution defined in equation \ref{eq:dist}, probabilistic predictions $f_*$ can be generated by constructing the conditional distribution $\mathbf{f_*}|\mathbf{X},\mathbf{y},\mathbf{X_*}$, since the original distribution of $\left( \begin{array}{c} \mathbf{y} \\ \mathbf{f_*} \end{array} \right) | \ \ \mathbf{X}, \mathbf{X}_*$ is a multivariate Gaussian, conditioning on a subset of elements $\mathbf{y}$ yields another Gaussian distribution with mean and covariance given below \ref{eq:posterior}.
+
+\begin{eqnarray}
+    \mathbf{f_*}|\mathbf{X},\mathbf{y},\mathbf{X_*} & \sim & \mathcal{N}(\mathbf{\bar{f}_*}, \Sigma_*)  \label{eq:posterior} \\
+    \mathbf{\bar{f}_*} & = & \mathbf{K}^T_{*} [\mathbf{K} + \sigma^{2} \mathbf{I}]^{-1} \mathbf{y} \\
+    \Sigma_* & = & \mathbf{K}_{**} - \mathbf{K}^T_{*} \left(\mathbf{K} + \sigma^{2} \mathbf{I}\right)^{-1} \mathbf{K}_{*}
+\end{eqnarray}
 
 \subsection{Kernel Functions}
 
-For the success of a Gaussian Process model an appropriate choice of kernel function is paramount. It is important to note that every kernel function generates a \emph{Reproducing Kernel Hilbert Space} (RKHS) of functions, and the nature of the kernel dictates what restrictions exist on the functions belonging to its RKHS. The Gaussian Process model essentially uses basis functions from this RKHS to represent the unknown function. The interested reader is suggested to refer to \cite{Berlinet2004} for a thorough treatment on RKHS and the rich theory behind them.
-
-Some common kernel functions used in machine learning are.
+For the success of a Gaussian Process model an appropriate choice of kernel function is paramount. Every kernel function generates a \emph{Reproducing Kernel Hilbert Space} (RKHS) of functions, and the nature of the kernel dictates what restrictions exist on the functions belonging to its RKHS. The Gaussian Process model essentially uses basis functions from this RKHS to represent the unknown function. The interested reader is suggested to refer to \cite{Berlinet2004} for a thorough treatment on RKHS and the rich theory behind them. Some common kernel functions used in machine learning are.
 
 \subsubsection{Radial Basis Function (RBF)}
 
-The RBF kernel is the most commonly used kernel in machine learning, in its core it encodes the idea of \emph{smoothness} because functions drawn from its Hilbert space are infinitely differentiable. The RBF kernel is also an example of a \emph{stationary} kernel i.e. its value depends only on $||\mathbf{x} - \mathbf{y}||$. The quantity $\sigma$ is known as the characteristic \emph{length scale} of this kernel, it is a free parameter (also known as hyper-parameter) which must be determined by the modeller, refer to section \ref{sec:hyp} on how suitable values of kernel hyper-parameters.
+The RBF kernel is the most commonly used kernel in machine learning, in its core it encodes the idea of \emph{smoothness} because functions drawn from its Hilbert space are infinitely differentiable. The RBF kernel is also an example of a \emph{stationary} kernel i.e. its value depends only on $||\mathbf{x} - \mathbf{y}||$. The quantity $l$ is known as the characteristic \emph{length scale} of this kernel, it is a free parameter (also known as hyper-parameter) which must be determined by the modeller, refer to section \ref{sec:hyp} on how suitable values of kernel hyper-parameters.
 
 \begin{equation}
-    K(\mathbf{x}, \mathbf{y}) = \frac{1}{2} exp(-||\mathbf{x} - \mathbf{y}||^2/\sigma^2)
+    K(\mathbf{x}, \mathbf{y}) = \frac{1}{2} exp(-||\mathbf{x} - \mathbf{y}||^2/l^2)
 \end{equation}
     
     
@@ -219,8 +255,7 @@ The polynomial kernel is also a common kernel function employed in research, it 
     K(\mathbf{x}, \mathbf{y}) = (\mathbf{x}^\intercal \mathbf{y} + b)^d 
 \end{equation}
 
-
-In this study, we construct Gaussian Process models with polynomial kernels for \emph{one step ahead} prediction of the $D_{st}$ index. 
+In this study, we construct Gaussian Process regression models with polynomial kernels for \emph{one step ahead} prediction of the $D_{st}$ index. 
 
 
 \subsection{Optimizing Hyper-parameters} \label{sec:hyp}
@@ -229,8 +264,8 @@ With kernel based prediction models one always encounters the crucial question o
 
 The simplest way to perform model tuning is called \emph{grid search} which entails evaluating the above objective function on a fixed grid which is constructed by making a list of values for each hyper-parameter and taking the combinations of all such values. There are more sophisticated methods for \emph{model tuning} such as \emph{coupled simulated annealing} (\citet{Xavier-De-Souza2010}) and \emph{simplex search} (\citet{Nelder1965}) but they are computationally more expensive. In this study we chose \emph{grid search} as the model tuning routine. 
 
-\section{One Step Ahead Prediction}
 
+\section{One Step Ahead Prediction}
 
 
 \subsection{Gaussian Process Nonlinear Auto-Regressive (GP-AR)}
