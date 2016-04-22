@@ -148,10 +148,10 @@ Geomagnetic indices come in various forms, they may take continuous or discreet 
 We focus on prediction of the hourly $D_{st}$ index which is an important problem because $D_{st}$ is a straight forward indicator of the occurrence of geomagnetic storms. More specifically we focus on the \emph{one step ahead} prediction of $D_{st}$ because it is the first step towards building long term predictions of geomagnetic response of the Earth to changing space weather conditions and because it has been the subject of several modeling efforts in the past.  
 
 
-We use the hourly resolution Omni data set (see \cite{OmniPaper}) as extracted from NASA/GSFC's OMNI data set through OMNIWeb.
-   
+We use the hourly resolution Omni data set (see \cite{OmniPaper}) as extracted from NASA/GSFC's OMNI data set through OMNIWeb. The rest of the paper is organized as follows. Section \ref{sec:method} gives an introduction to the \emph{Gaussian Process} methodology for regression and the various issues surrounding their application. In section \ref{sec:osa} two different \emph{Gaussian Process} auto-regressive models are proposed and subsequently in sections \ref{sec:exp} and \ref{sec:res} bench marked against the \emph{Persistence} $D_{st}$ model as well as other models outlined in \citet{Ji2012}.
+
   
-\section{Methodology: Gaussian Process}
+\section{Methodology: Gaussian Process} \label{sec:method}
 
 \emph{Gaussian Processes} first appeared in machine learning research as the limiting case of Bayesian inference performed on neural networks with infinitely many neurons in the hidden layers \citet{Neal:1996:BLN:525544}. Although their inception in the machine learning community is recent, their origins can be traced back to the geo-statistics research community where they are known as \emph{Kriging} methods (\citet{krige1951statistical}). In pure mathematics area \emph{Gaussian Processes} have been studied extensively and their existence was first proven by Kolmogorov's extension theorem (\citet{tao2011introduction}). The reader is requested to refer to \cite{Rasmussen:2005:GPM:1162254} for an in depth treatment of Gaussian Processes in Machine Learning.
 
@@ -236,7 +236,7 @@ With the multivariate normal distribution defined in equation \ref{eq:dist}, pro
 
 \subsection{Kernel Functions}
 
-For the success of a Gaussian Process model an appropriate choice of kernel function is paramount. Every kernel function generates a \emph{Reproducing Kernel Hilbert Space} (RKHS) of functions, and the nature of the kernel dictates what restrictions exist on the functions belonging to its RKHS. The Gaussian Process model essentially uses basis functions from this RKHS to represent the unknown function. The interested reader is suggested to refer to \cite{Berlinet2004} for a thorough treatment on RKHS and the rich theory behind them. Some common kernel functions used in machine learning are.
+For the success of a Gaussian Process model an appropriate choice of kernel function is paramount. The symmetry and positive semi-definiteness of \emph{Gaussian Process} kernels implies that they represent inner-products between some basis function representation of the data. This is analogous to a Fourier series decomposition in Physics. The interested reader is suggested to refer to \cite{Berlinet2004}, \citet{Scholkopf:2001:LKS:559923} and \citet{hofmann2008} for a thorough treatment on kernel functions and the rich theory behind them. Some common kernel functions used in machine learning are.
 
 \subsubsection{Radial Basis Function (RBF)}
 
@@ -257,43 +257,65 @@ The polynomial kernel is also a common kernel function employed in research, it 
 
 In this study, we construct Gaussian Process regression models with polynomial kernels for \emph{one step ahead} prediction of the $D_{st}$ index. 
 
-
 \subsection{Optimizing Hyper-parameters} \label{sec:hyp}
 
-With kernel based prediction models one always encounters the crucial question of what values to assign to the kernel hyper-parameters. This is known as \emph{model tuning} in kernel research parlance. There are many methods to perform \emph{model tuning}, one generally formulates an objective function and aims to optimize it in terms of the hyper-parameters. Common examples of objective functions include data likelihood, cross validation performance scores and validation set performance scores among others. Since the objective function for the model tuning problem is non-convex and non-smooth in general, gradient free approaches are used to find approximate values of local optima.
+When fitting \emph{Gaussian Process} models to data, the question to be answered following choice of a kernel function is the assignment of appropriate values to the kernel hyper-parameters and noise level ($\sigma^2$). This is known as the problem of \emph{model selection}.
 
-The simplest way to perform model tuning is called \emph{grid search} which entails evaluating the above objective function on a fixed grid which is constructed by making a list of values for each hyper-parameter and taking the combinations of all such values. There are more sophisticated methods for \emph{model tuning} such as \emph{coupled simulated annealing} (\citet{Xavier-De-Souza2010}) and \emph{simplex search} (\citet{Nelder1965}) but they are computationally more expensive. In this study we chose \emph{grid search} as the model tuning routine. 
+Common examples of criteria used for \emph{model selection} include data likelihood, cross validation performance scores and validation set performance scores among others. Since model selection criteria are non-convex and non-smooth in general, gradient free approaches are used to find approximate values of local optima.
+
+The simplest way to perform \emph{model selection} is called \emph{grid search} which entails evaluating the above criteria on a fixed grid which is constructed by making a list of values for each hyper-parameter and taking the combinations of all such values. There are more sophisticated methods for \emph{model tuning} such as \emph{coupled simulated annealing} (\citet{Xavier-De-Souza2010}) and \emph{simplex search} (\citet{Nelder1965}) but they are computationally more expensive. In this study we employ \emph{grid search} to find the best performing set of hyper-parameter assignments inside a predefined grid of possible hyper-parameter values.
 
 
-\section{One Step Ahead Prediction}
+\section{One Step Ahead Prediction} \label{sec:osa}
 
+Below in equations \ref{eq:Dst}, \ref{eq:GPNoise}, \ref{eq:DstGP}, \ref{eq:GPPoly} we outline a \emph{Gaussian Process} formulation for \emph{OSA} prediction of $D_{st}$. A vector of features $x_{t-1}$ is used as input to an unknown function $f(x_{t-1})$ which drawn from a \emph{Gaussian Process} driven by a linear polynomial kernel. 
 
-\subsection{Gaussian Process Nonlinear Auto-Regressive (GP-AR)}
+The features $x_{t-1}$ can be any collection of quantities in the hourly resolution Omni data set. Generally $x_{t-1}$ are time histories of $D_{st}$ or other important variables examples being plasma pressure $p(t)$, solar wind speed $V(t)$, z component of the interplanetary magnetic field $B_z(t)$.
 
-The input vector $x_t$ at each time step is the $p$ order time history of $D_{st}$.
-  \begin{eqnarray}
-    D_{st}(t) & = & f(x_t) + \epsilon\\
-    x_t & = & \left(D_{st}(t-1), D_{st}(t-2), \cdots , D_{st}(t-p)\right) \\
-    f(x_t) & \sim & \mathcal{GP}(m(x_t), K(x_t,x_s)) \label{eq:DstGP}
+\begin{eqnarray}
+    D_{st}(t) & = & f(\mathbf{x}_{t-1}) + \epsilon \label{eq:Dst} \\
+    \epsilon & \sim & \mathcal{N}(0, \sigma^2) \label{eq:GPNoise} \\
+    f(x_t) & \sim & \mathcal{GP}(m(\mathbf{x}_t), K(\mathbf{x}_t, \mathbf{x}_s)) \label{eq:DstGP} \\
+    K(\mathbf{x}, \mathbf{y}) & = & \mathbf{x}^\intercal \mathbf{y} + b \label{eq:GPPoly}
 \end{eqnarray}
 
-\subsection{Gaussian Process Nonlinear Auto-Regressive with eXogenous inputs (GP-ARX)}
+In \ref{sec:gpar} and \ref{sec:gparx} below we consider two choices for the input features $\mathbf{x}_{t-1}$ leading to two variants of \emph{Gaussian Process} regression for $D_{st}$ time series prediction.
 
-Solar wind velocity $V$ and interplanetary magnetic field $B_z$ recorded at the ACE satellite are used as the exogenous inputs of the model, along with the time history of $D_{st}$.
+\subsection{Gaussian Process Auto-Regressive (GP-AR)} \label{sec:gpar}
+
+The simplest auto-regressive models for \emph{OSA} prediction of $D_{st}$ are those that use only the history of $D_{st}$ to construct input features for model training. The input features $\mathbf{x}_{t-1}$ at each time step is the history of $D_{st}(t)$ until a time lag of $p$ steps.
+
+\begin{eqnarray*}
+    \mathbf{x}_t & = & \left(D_{st}(t), D_{st}(t-1), \cdots , D_{st}(t-p+1)\right)
+\end{eqnarray*}
+
+\subsection{Gaussian Process Auto-Regressive with eXogenous inputs (GP-ARX)} \label{sec:gparx}
+
+Auto-regressive models can be improved by including exogenous quantities that can help in improving predictions. It is well known that the solar wind and interplanetary magnetic field are important factors that influence the Earth's geomagnetic state.
+
+Hourly solar wind velocity $V(t)$ and interplanetary magnetic field $B_z(t)$ recorded at the ACE satellite are used as the exogenous inputs of the model, along with the time history of $D_{st}$. In this model we choose distinct time lags $p$ and $p_{ex}$ for auto-regressive and exogenous variables respectively.
     
-  \begin{eqnarray}
-    & D_{st}(t) & = f(\mathbf{x}_t) + \epsilon \\
-        & \mathbf{x}_t & = (D_{st}(t-1), D_{st}(t-2), \cdots , D_{st}(t-p), \\
-        & \ \ \ \ \ & V(t-1), V(t-2), \cdots, V(t-p),\\
-        & \ \ \ \ \ & B_{z}(t-1), B_{z}(t-2), \cdots, B_{z}(t-p))\\
-    & f(x_t) & \sim \mathcal{GP}(m(\mathbf{x}_t), K(\mathbf{x}_t,\mathbf{x}_s)) \label{eq:DstGP1}
-\end{eqnarray}
+\begin{eqnarray*}
+        & \mathbf{x}_t & = (D_{st}(t), D_{st}(t-1), \cdots , D_{st}(t-p+1), \\
+        & \ \ \ \ \ & V(t), V(t-1), \cdots, V(t-p_{ex}+1),\\
+        & \ \ \ \ \ & B_{z}(t), B_{z}(t-1), \cdots, B_{z}(t-p_{ex}+1),\\
+        & \ \ \ \ \ & V B_{z}(t), V B_{z}(t-1), \cdots, V B_{z}(t-p_{ex}+1))
+\end{eqnarray*}
+
+\section{Model Training and Validation}
 
 
 
-\section{Experiments}
 
-   \begin{table}
+\section{Experiments} \label{sec:exp}
+
+
+
+\begin{comment}
+%%
+%%
+%%
+\begin{table}
       \caption[]{Opacity sources.}
          \label{KapSou}
      $$ 
@@ -315,9 +337,22 @@ Solar wind velocity $V$ and interplanetary magnetic field $B_z$ recorded at the 
 \item[$^{\mathrm{a}}$] This is footnote a
 \end{list}
 \end{table}
-
-\section{Results}
+%%
+%%
+%%
+\end{comment}
+   
+\section{Results} \label{sec:res}
 %%  This two-panel figure was inserted by JFW to demonstrate the subfigure and epstopdf packages
+
+
+\begin{figure}
+   \centering
+   \subfigure{\includegraphics[width=\columnwidth]{Compare_RelProb.png}}
+   \caption{\small  Comparison of empirical distribution of relative errors for various models on the list of 63 storms in \citet{Ji2012}.} 
+   \label{fig:relprob}
+   \end{figure}
+
 
 
 \begin{figure}
