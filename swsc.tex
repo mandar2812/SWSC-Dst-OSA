@@ -304,44 +304,38 @@ Hourly solar wind velocity $V(t)$ and interplanetary magnetic field $B_z(t)$ rec
 
 \section{Model Training and Validation}
 
+Before performance bench marks for \emph{OSA} $D_{st}$ prediction are run on the 63 geomagnetic storm events from 1998-2006 in \cite{Ji2012}, training and model selection of \emph{GP-AR} and \emph{GP-ARX} models on independent data sets must be performed. For this purpose we choose segments 00:00 1 January 2008 - 10:00 11 January 2008 and 00:00 15 November 2014 - 23:00 1 December 2014 for training and model selection respectively.
 
+The time lags chosen for \emph{GP-AR} are $p = 6$ while for \emph{GP-ARX} $p=6$, $p_{ex} = 1$ are arrived by experimenting with values starting from one and choosing the value of $p$ yielding best performance on the 63 events in the bench mark.   
 
 
 \section{Experiments} \label{sec:exp}
 
+\subsection{Models Compared}
 
-
-\begin{comment}
-%%
-%%
-%%
 \begin{table}
-      \caption[]{Opacity sources.}
-         \label{KapSou}
-     $$ 
-         \begin{array}{p{0.5\linewidth}l}
+      \caption[]{One Step Ahead $D_{st}$ prediction models}
+         \label{table:DstModels}
+      
+         \begin{tabular}{lll}
             \hline
             \noalign{\smallskip}
-            Source      &  T / {[\mathrm{K}]} \\
+            Model     &  Reference & Description \\
             \noalign{\smallskip}
             \hline
             \noalign{\smallskip}
-            \citet{Ji2012} & \leq 1700^{\mathrm{a}}     \\
-            \citet{kocijan2015modelling}                     & 1700 \leq T \leq 5000 \\
-            \citet{Berlinet2004}                  & 5000 \leq             \\
+            TL & \citet{JGRA:JGRA16300} & Auto regressive model decomposable into additive terms.      \\
+            NM & \citet{balikhin:narmax} & Non linear auto regressive with exogenous inputs. \\
+            B & \citet{JGR:JGR10260} & Prediction of $D_{st}$ by solving ODE having injection and decay terms. \\
+            W & \citet{Wang:Dst} & Obtained by modification of injection term in \citet{JGR:JGR10260}. \\
+            FL & \citet{GRL:GRL11549} & Uses polarity of magnetic clouds to predict geomagnetic response.\\
+            OM & \citet{JGRA:JGRA14856} & Modification of injection term in \citet{JGR:JGR10260}.\\
             \noalign{\smallskip}
             \hline
-         \end{array}
-     $$ 
-\begin{list}{}{}
-\item[$^{\mathrm{a}}$] This is footnote a
-\end{list}
+         \end{tabular}
 \end{table}
-%%
-%%
-%%
-\end{comment}
-   
+
+
 \section{Results} \label{sec:res}
 %%  This two-panel figure was inserted by JFW to demonstrate the subfigure and epstopdf packages
 
