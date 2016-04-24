@@ -112,8 +112,8 @@
    \abstract{
     We aim to improve the state of the art of \emph{One Step Ahead}(OSA) prediction of the $D_{st}$ geomagnetic activity index. In the domain of OSA prediction, it is well known that $D_{st}(t)$ values correlate strongly with values one hour in the past (i.e. $D_{st}(t-1)$). While a number of forecasting models have been proposed and compared, none of them have been compared with the \emph{Persistence} model to quantify their performance improvements above this most trivial of predictors. In this study we train Gaussian Process regression models for One Step Ahead (OSE) prediction of the Disturbance Storm Time ($D_{st}$) geomagnetic index. We propose three variants of the Gaussian Process model.
     \begin{enumerate*}
-      \item Gaussian Process Auto regressive GP-AR 
-      \item Gaussian Process Auto regressive with eXogenous inputs GP-ARX. 
+      \item Gaussian Process Auto regressive (GP-AR) 
+      \item Gaussian Process Auto regressive with eXogenous inputs (GP-ARX). 
     \end{enumerate*}
     We compare the performance of these models with the current state of the art in one step ahead $D_{st}$ prediction on a set of 
     63 benchmark storms from 1998-2006. The proposed Gaussian Process models not only outperform the rest but also the \emph{Persistence} model.
@@ -310,6 +310,16 @@ Before performance bench marks for \emph{OSA} $D_{st}$ prediction are run on the
 
 Model selection of \emph{GP-AR} and \emph{GP-ARX} is performed by grid search methodology and the root mean square error (\emph{RMSE}) on the validation set is used to select the values of the model hyper-parameters. The time lags chosen for \emph{GP-AR} are $p = 6$ while for \emph{GP-ARX} $p=6$, $p_{ex} = 1$ are arrived by experimenting with values starting from one and choosing the value of $p$ yielding best performance on the 63 events in the bench mark.   
 
+\begin{figure}[ht]
+   \centering
+   \subfigure{\includegraphics[width=\columnwidth]{Compare_RMSE.png}}
+   \vspace{12pt}
+   \subfigure{\includegraphics[width=\columnwidth]{Compare_CC.png}}
+   \caption{\small  Performance Comparison; left: Averaged RMSE right: Averaged Cross correlation coefficient} 
+   \label{fig:rmsecc}
+   \end{figure}
+
+
 \section{Experiments} \label{sec:exp}
 
 \citet{Ji2012} compare a six OSA $D_{st}$ models in their paper by compiling a list of 63 geomagnetic storm events of varying strengths which occurred from 1998-2006. This serves as an important stepping stone for a systematic comparison of existing and new prediction techniques because performance metrics are averaged over a large number of storm events that occurred over a 8 year period. They compare the averaged performance of these models on four key performance metrics.
@@ -322,6 +332,16 @@ Model selection of \emph{GP-AR} and \emph{GP-ARX} is performed by grid search me
 \end{enumerate}
 
 Apart from the metrics above, we also generate the empirical distribution of absolute relative errors $|\frac{D_{st} - \hat{D_{st}}}{D_{st}}|$ for the \emph{GP-AR}, \emph{GP-ARX}, \emph{NM} and \emph{TL} models. These empirical cumulative distributions enable us to upper bound the percentage error in $D_{st}$ prediction and attach probability estimates for said bounds.
+
+
+\begin{figure}
+   \centering
+   \subfigure{\includegraphics[width=\columnwidth]{Compare_deltaDst.png}}
+   \vspace{12pt}
+   \subfigure{\includegraphics[width=\columnwidth]{Compare_timingerr.png}}
+   \caption{\small  Performance Comparison; left: Averaged $\Delta Dst_{min}$ right: Averaged absolute timing error} 
+   \label{fig:deltaDst}
+   \end{figure}
 
 \subsection{Models Compared}
 
@@ -351,44 +371,46 @@ For the purpose of generating the cumulative probability plots of the model erro
          \end{tabular}
 \end{table}
 
+With respect to the \emph{TL} model one important concern must be expressed. The training of the \emph{TL} model was done on Omni data from 1996-2002 which overlaps with a large number of the storm events, therefore the experimental procedure has a strong bias towards \emph{TL} model.
+
+
+
 
 \section{Results} \label{sec:res}
 %%  This two-panel figure was inserted by JFW to demonstrate the subfigure and epstopdf packages
 
+
+
+Figures \ref{fig:rmsecc} and \ref{fig:deltaDst} compare the performance of \emph{GP-AR}, \emph{GP-ARX} and the \emph{Persistence} model with the existing results of \citet{Ji2012}. Two central themes come out of these charts.
 
 \begin{figure}
    \centering
    \subfigure{\includegraphics[width=\columnwidth]{Compare_RelProb.png}}
    \caption{\small  Comparison of empirical distribution of relative errors for various models on the list of 63 storms in \citet{Ji2012}.} 
    \label{fig:relprob}
-   \end{figure}
+\end{figure}
 
 
+\subsection{Persistence Behavior}
 
-\begin{figure}
-   \centering
-   \subfigure{\includegraphics[width=\columnwidth]{Compare_RMSE.png}}
-   \vspace{12pt}
-   \subfigure{\includegraphics[width=\columnwidth]{Compare_CC.png}}
-   \caption{\small  Performance Comparison} 
-   \label{fig:rmsecc}
-   \end{figure}
+It is clear that the \emph{persistence} behavior in the $D_{st}$ values is very strong i.e. the trivial predictive model $\hat{D_{st}}(t) = D_{st}(t-1)$ gives excellent performance. In fact it can be seen in these figures that the \emph{Persistence} model is outperforms every model compared by \citet{Ji2012} in the context of OSA prediction of $D_{st}$.
 
-\begin{figure}
-   \centering
-   \subfigure{\includegraphics[width=\columnwidth]{Compare_deltaDst.png}}
-   \vspace{12pt}
-   \subfigure{\includegraphics[width=\columnwidth]{Compare_timingerr.png}}
-   \caption{\small  Performance Comparison} 
-   \label{fig:deltaDst}
-   \end{figure}
+
+\subsection{Assessment of Gaussian Process Models}
+
+The results indicate that there are many benefits to be gained by the application of Gaussian Process models for prediction of $D_{st}$. The \emph{GP-AR} and \emph{GP-ARX} not only outperform the models compared in \citet{Ji2012} but also the \emph{Persistence} model. Figure \ref{fig:relprob} compares the empirical distributions of absolute relative model errors across all storm events in the experiments. If one chooses a $95\%$ probability bound then it can be seen that the \emph{GP-ARX} model bounds the relative error to $20\%$ of the actual $D_{st}$ value, while in the case of the \emph{NM} model it bounds the relative error to $50\%$ of the actual $D_{st}$ value. Therefore the \emph{GP-ARX} model gives an approximate benefit of $25\%$ over the other compared models on the test data set chosen. 
+
+If one compares the training sets used by the models, one can appreciate that they are able to learn robust models for prediction with relatively small training and validations sets (training set contains 250 instances, while the validation set contains 432 instances) on the other hand the \emph{NM} model uses one year (8760 instances) of data to learn the formula outlined in \citet{balikhin:narmax} and the \emph{TL} model uses six years of data (52560 instances) for training.
+
+The encouraging results of Gaussian Processes illustrate the strengths of the Bayesian approach to predictive modeling. Since the GP models generate predictive distributions for test data and not just point predictions they lend themselves to the requirements of space weather prediction very well because of the need to generate error bars on predictions.
 
 \section{Conclusions}
 
+We conclude this paper with three key conclusions/insights learned from our activities so far.
    \begin{enumerate}
-      \item Persistence model due to \emph{One Step Ahead} restriction 
-      \item Superior performance of \emph{Gaussian Process} NAR and NARX models
-      \item Multi step ahead prediction should be the preferred gold standard with respect to forecasting of geomagnetic indices.
+      \item \emph{Persistence} model must be central in the model evaluation process in the context of \emph{One Step Ahead} prediction of the $D_{st}$ index. This is due to its excellent performance in terms of errors and correlations. 
+      \item \emph{Gaussian Process} AR and ARX models give encouraring benefits in OSA prediction even when compared to the \emph{Persistence} model. Leveraging the strengths of the Bayesian approach, they are able to learn robust predictors from data.
+      \item Multi-step ahead prediction should be the preferred gold standard with respect to forecasting of geomagnetic indices. Also important is the usage of more informative performance metrics for evaluating and comparing empirical predictive models.
    \end{enumerate}
 
 \begin{acknowledgements}
