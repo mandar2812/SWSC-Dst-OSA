@@ -330,10 +330,11 @@ Model selection of \emph{GP-AR} and \emph{GP-ARX} is performed by grid search me
     \item $|\Delta t_{peak}|$: The error in predicting the timing of a storm peak, also called \emph{timing error}. 
 \end{enumerate}
 
+
 \begin{figure}
    \centering
-   \subfigure{\includegraphics[width=\columnwidth]{Compare_RelProb.png}}
-   \caption{\small  Comparison of empirical distribution of relative errors for various models on the list of 63 storms in \citet{Ji2012}.} 
+   \includegraphics[width=\textwidth]{Compare_RelProb.png}
+   \caption{Comparison of empirical distribution of relative errors for various models on the list of 63 storms in \citet{Ji2012}.}
    \label{fig:relprob}
 \end{figure}
 
@@ -403,20 +404,20 @@ With respect to the \emph{TL} model one important concern must be expressed. The
 
 Figures \ref{fig:rmse}, \ref{fig:cc}, \ref{fig:deltaDst} and \ref{fig:timingErr} compare the performance of \emph{GP-AR}, \emph{GP-ARX} and the \emph{Persistence} model with the existing results of \citet{Ji2012}. Figure \ref{fig:rmse} compares the average RMSE of the models over the list of 63 storms, we can see that the \emph{GP-ARX} model gives an improvement of approximately $38\%$ in RMSE with respect to the \emph{TL} model and $60\%$ improvement with respect to the \emph{NM} model. 
 
+Figure \ref{fig:relprob} compares the empirical distributions of absolute relative model errors across all storm events in the experiments. If one chooses a $95\%$ probability bound then it can be seen that the \emph{GP-ARX} model bounds the relative error to $20\%$ of the actual $D_{st}$ value, while in the case of the \emph{NM} model it bounds the relative error to $50\%$ of the actual $D_{st}$ value. Therefore the \emph{GP-ARX} model gives an approximate improvement of $25\%$ over the other compared models on the test data set chosen.
 
-Two central themes come out of these charts.
+Figure \ref{fig:cc} shows the comparison of correlation coefficients between model predictions and actual $D_{st}$ values. From the results of \citet{Ji2012}, the \emph{TL} model gives the highest correlation coefficient of $94\%$, but that is not surprising considering the fact that there is a large overlap between the training data used to train it and storm events. This is also the case in \ref{fig:relprob} where we average predictions generated from a pre-trained instance of the \emph{TL} model. Even so the \emph{GP-ARX} model gives comparable correlation coefficient to \emph{TL} a testimony to its performance given that its training set has no overlap with the storm events.
 
+Figure \ref{fig:deltaDst} shows how the different models compare with respect to accuracy in predicting the peak value of $D_{st}$ during storm events ($\Delta Dst_{min}$ averaged over all storms). In the context of this metric the \emph{GP-ARX} model gives a $31\%$ improvement over the \emph{TL} model and $40\%$ over the \emph{NM} model. It is trivial to note that by definition, the \emph{Persistence} model ($\hat{D_{st}}(t) = D_{st}(t-1)$) will have $\Delta Dst_{min} = 0$ for every storm instance.
 
-\subsection{Persistence Behavior}
+Figure \ref{fig:timingErr} compares the time discrepancy of predicting the storm peak, again as seen above the \emph{Persistence} model will always have $\Delta t_{peak} = -1$. Two central themes come out of these charts.
 
-It is clear that the \emph{persistence} behavior in the $D_{st}$ values is very strong i.e. the trivial predictive model $\hat{D_{st}}(t) = D_{st}(t-1)$ gives excellent performance. In fact it can be seen in these figures that the \emph{Persistence} model is outperforms every model compared by \citet{Ji2012} in the context of OSA prediction of $D_{st}$.
+\begin{enumerate}
+    \item Persistence Behavior: It is clear that the \emph{persistence} behavior in the $D_{st}$ values is very strong i.e. the trivial predictive model $\hat{D_{st}}(t) = D_{st}(t-1)$ gives excellent performance. In fact it can be seen in these figures that the \emph{Persistence} model is outperforms every model compared by \citet{Ji2012} in the context of OSA prediction of $D_{st}$. 
+    \item Assessment of Gaussian Process Models: The results indicate that there are many benefits to be gained by the application of Gaussian Process models for prediction of $D_{st}$. The \emph{GP-AR} and \emph{GP-ARX} not only outperform the models compared in \citet{Ji2012} but also the \emph{Persistence} model. 
+\end{enumerate}
 
-
-\subsection{Assessment of Gaussian Process Models}
-
-The results indicate that there are many benefits to be gained by the application of Gaussian Process models for prediction of $D_{st}$. The \emph{GP-AR} and \emph{GP-ARX} not only outperform the models compared in \citet{Ji2012} but also the \emph{Persistence} model. Figure \ref{fig:relprob} compares the empirical distributions of absolute relative model errors across all storm events in the experiments. If one chooses a $95\%$ probability bound then it can be seen that the \emph{GP-ARX} model bounds the relative error to $20\%$ of the actual $D_{st}$ value, while in the case of the \emph{NM} model it bounds the relative error to $50\%$ of the actual $D_{st}$ value. Therefore the \emph{GP-ARX} model gives an approximate benefit of $25\%$ over the other compared models on the test data set chosen. 
-
-
+  
 \section{Conclusions}
 
 We conclude this paper with three key conclusions/insights learned from our research so far.
