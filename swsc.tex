@@ -135,8 +135,9 @@ The Sun is the principal driver of Space Weather, the steady solar wind and inte
 
 Although the qualitative bifurcation of these phenomena is well understood and each has been studied in depth, the magnetosphere's dynamics and its associated solar wind driver form a complex nonlinear coupled dynamical system. It is therefore not only instructive but also greatly simplifying to use representative indices to quantify the state of geomagnetic activity.
 
-Geomagnetic indices come in various forms, they may take continuous or discreet values. Their values are often calculated by averaging or combining a number of readings taken by instruments around the Earth. Each geomagnetic index is a proxy for a particular kind of phenomena. Some popular indices are.
+Geomagnetic indices come in various forms, they may take continuous or discreet values. Their values are often calculated by averaging or combining a number of readings taken by instruments around the Earth. Each geomagnetic index is a proxy for a particular kind of phenomena. Some popular indices are the $K_p$, $D_{st}$ and the AE index.
 
+\begin{comment}
 \begin{enumerate}
     \item $K_p$: The Kp-index is a discreet valued global geomagnetic storm index and is based on 3 hour measurements of the K-indices, for a given value, for each of the past days. The K-index itself is a three hour long quasi-logarithmic local index of the geomagnetic activity, relative to a calm day curve for the given location.
     
@@ -144,9 +145,9 @@ Geomagnetic indices come in various forms, they may take continuous or discreet 
     
     \item $D_{st}$: A continuous hourly index which measures the weakening of the Earths magnetic field due to ring currents. 
 \end{enumerate}
+\end{comment}
 
-We focus on prediction of the hourly $D_{st}$ index which is an important problem because $D_{st}$ is a straight forward indicator of the occurrence of geomagnetic storms. More specifically we focus on the \emph{one step ahead} prediction of $D_{st}$ because it is the first step towards building long term predictions of geomagnetic response of the Earth to changing space weather conditions and because it has been the subject of several modeling efforts in the past.  
-
+We focus on prediction of the hourly $D_{st}$ index which is an important problem because $D_{st}$ is a straight forward indicator of the occurrence of geomagnetic storms. More specifically we focus on the \emph{one step ahead} (OSA) prediction of $D_{st}$ because it is the first step towards building long term predictions of geomagnetic response of the Earth to changing space weather conditions. This problem has been the subject of several modeling efforts so far, some of the earliest are by \citet{JGR:JGR10260} who outlined a prediction framework that has been used as a base line for many $D_{st}$ prediction models. \citet{JGR:JGR10260} model $D_{st}(t)$ a function of time using an \emph{Ordinary Differential Equation} (ODE) which modeled it's rate of change as a combination of two terms: decay and injection $\frac{d D_{st}(t)}{dt} = Q(t) - \frac{D_{st}(t)}{\tau}$. The \citet{JGR:JGR10260} model has proven to be very influential in the Space Weather research effort and many subsequent works like \citet{Wang:Dst}, \citet{JGRA:JGRA14856} modified the proposed ODE by defining expressions for the injection term $Q(t)$.
 
 We use the hourly resolution Omni data set (see \cite{OmniPaper}) as extracted from NASA/GSFC's OMNI data set through OMNIWeb. The rest of the paper is organized as follows. Section \ref{sec:method} gives an introduction to the \emph{Gaussian Process} methodology for regression and the various issues surrounding their application. In section \ref{sec:osa} two different \emph{Gaussian Process} auto-regressive models are proposed and subsequently in sections \ref{sec:exp} and \ref{sec:res} bench marked against the \emph{Persistence} $D_{st}$ model as well as other models outlined in \citet{Ji2012}.
 
@@ -413,7 +414,7 @@ Figure \ref{fig:deltaDst} shows how the different models compare with respect to
 Figure \ref{fig:timingErr} compares the time discrepancy of predicting the storm peak, again as seen above the \emph{Persistence} model will always have $\Delta t_{peak} = -1$. Two central themes come out of these charts.
 
 \begin{enumerate}
-    \item Persistence Behavior: It is clear that the \emph{persistence} behavior in the $D_{st}$ values is very strong i.e. the trivial predictive model $\hat{D_{st}}(t) = D_{st}(t-1)$ gives excellent performance. In fact it can be seen in these figures that the \emph{Persistence} model is outperforms every model compared by \citet{Ji2012} in the context of OSA prediction of $D_{st}$. 
+    \item Persistence Behavior: It is clear that the \emph{persistence} behavior in the $D_{st}$ values is very strong i.e. the trivial predictive model $\hat{D_{st}}(t) = D_{st}(t-1)$ gives excellent performance. In fact it can be seen in these figures that the \emph{Persistence} model is outperforms every model compared by \citet{Ji2012} in the context of OSA prediction of $D_{st}$. Therefore any model that is proposed to tackle the OSA prediction problem for $D_{st}$ must be compared to and show visible gains over the \emph{Persistence} model.
     \item Assessment of Gaussian Process Models: The results indicate that there are many benefits to be gained by the application of Gaussian Process models for prediction of $D_{st}$. The \emph{GP-AR} and \emph{GP-ARX} not only outperform the models compared in \citet{Ji2012} but also the \emph{Persistence} model. 
 \end{enumerate}
 
