@@ -147,8 +147,24 @@ Geomagnetic indices come in various forms, they may take continuous or discreet 
 \end{enumerate}
 \end{comment}
 
-We focus on prediction of the hourly $D_{st}$ index which is an important problem because $D_{st}$ is a straight forward indicator of the occurrence of geomagnetic storms. More specifically we focus on the \emph{one step ahead} (OSA) prediction of $D_{st}$ because it is the first step towards building long term predictions of geomagnetic response of the Earth to changing space weather conditions. This problem has been the subject of several modeling efforts so far, some of the earliest are by \citet{JGR:JGR10260} who outlined a prediction framework that has been used as a base line for many $D_{st}$ prediction models. \citet{JGR:JGR10260} model $D_{st}(t)$ a function of time using an \emph{Ordinary Differential Equation} (ODE) which modeled it's rate of change as a combination of two terms: decay and injection $\frac{d D_{st}(t)}{dt} = Q(t) - \frac{D_{st}(t)}{\tau}$. The \citet{JGR:JGR10260} model has proven to be very influential in the Space Weather research effort and many subsequent works like \citet{Wang:Dst}, \citet{JGRA:JGRA14856} modified the proposed ODE by defining expressions for the injection term $Q(t)$.
+%Talk about Burton and friends
+We focus on prediction of the hourly $D_{st}$ index which is an important problem because $D_{st}$ is a straight forward indicator of the occurrence of geomagnetic storms. More specifically we focus on the \emph{one step ahead} (OSA) prediction of $D_{st}$ because it is the first step towards building long term predictions of geomagnetic response of the Earth to changing space weather conditions. 
 
+The $D_{st}$ OSA prediction problem has been the subject of several modeling efforts so far, some of the earliest are by \citet{JGR:JGR10260} who outlined a prediction framework that has been used as a base line for many $D_{st}$ models. \citet{JGR:JGR10260} model $D_{st}(t)$ a function of time using an \emph{Ordinary Differential Equation} (ODE) which modeled it's rate of change as a combination of two terms: decay and injection $\frac{d D_{st}(t)}{dt} = Q(t) - \frac{D_{st}(t)}{\tau}$. 
+
+The \citet{JGR:JGR10260} model has proven to be very influential in the Space Weather research effort and many subsequent works like \citet{Wang:Dst}, \citet{JGRA:JGRA14856} modified the proposed ODE by defining expressions for the injection term $Q(t)$. More recently \citet{Ballatore2014} have tried to generate estimates for the injection and decay terms in Burton's equation.
+
+%Talk about NARMAX Dst
+Among the other major empirical models used to predict $D_{st}$ has been the \emph{Nonlinear Auto-Regessive Moving Average with eXogenous inputs} (NARMAX) methodology developed in \citet{doi:10.1080/00207178908559767}, \citet{GRL:GRL13494}, \citet{GRL:GRL20944}, \citet{JGRA:JGRA18657}, \citet{JGRA:JGRA20661}, \citet{JGRA:JGRA50192} and \citet{balikhin:narmax}. The NARMAX methodology builds models by constructing polynomial expansions of inputs and determines the best combinations or monomials to include in the refined model using the \emph{error reduction ratio} (ERR) criterion. The parameters of the NARMAX OLS-ERR model are calculated using the standard \emph{ordinary least squares} (OLS) method hence these methods are also denoted by the acronym NARMAX OLS-ERR. The reader may refer to \citet{billings2013nonlinear} for a detailed exposition on the NARMAX methodology.
+
+%Talk about neural networks
+Application of \emph{Machine Learning} methods for prediction of geomagnetic indices is fairly recent (1990's onwards). \emph{Neural Networks} have been a popular choice for building predictive models and researchers employed the standard \emph{feed forward} and the more specialized \emph{recurrent} architectures. \citet{Lund} proposed an \emph{Elman} recurrent network architecture for prediction of $D_{st}$. \citet{SWE:SWE286} originally proposed a \emph{feed forward} network for predicting the $K_p$ index which employed the \emph{Boyle coupling function} \citet{boyle1997empirical}, in \citet{SWE:SWE286} the same architecture is adapted for prediction of $D_{st}$ and $AE$ indices as well.
+
+%Talk about comparison papers, number of storms covered and Persistence
+
+
+
+% Talk about Gaussian Process
 We use the hourly resolution Omni data set (see \cite{OmniPaper}) as extracted from NASA/GSFC's OMNI data set through OMNIWeb. The rest of the paper is organized as follows. Section \ref{sec:method} gives an introduction to the \emph{Gaussian Process} methodology for regression and the various issues surrounding their application. In section \ref{sec:osa} two different \emph{Gaussian Process} auto-regressive models are proposed and subsequently in sections \ref{sec:exp} and \ref{sec:res} bench marked against the \emph{Persistence} $D_{st}$ model as well as other models outlined in \citet{Ji2012}.
 
   
