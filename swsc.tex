@@ -175,9 +175,6 @@ We use the hourly resolution Omni data set (see \cite{OmniPaper}) as extracted f
   
 \section{Methodology: Gaussian Process} \label{sec:method}
 
-\emph{Gaussian Processes} first appeared in machine learning research in \citet{Neal:1996:BLN:525544}, as the limiting case of Bayesian inference performed on neural networks with infinitely many neurons in the hidden layers. Although their inception in the machine learning community is recent, their origins can be traced back to the geo-statistics research community where they are known as \emph{Kriging} methods (\citet{krige1951statistical}). In pure mathematics area \emph{Gaussian Processes} have been studied extensively and their existence was first proven by Kolmogorov's extension theorem (\citet{tao2011introduction}). The reader is requested to refer to \cite{Rasmussen:2005:GPM:1162254} for an in depth treatment of Gaussian Processes in machine learning.
-
-
 A \emph{Gaussian Process} is a stochastic process $f(\mathbf{x}), \ \mathbf{x} \in \mathbb{R}^d$ whose finite dimensional distributions over a set of points $\mathbf{x}_1, \cdots, \mathbf{x}_n$ are multivariate Gaussian. Formally this is expressed as.
 
 \begin{eqnarray}
@@ -209,6 +206,8 @@ Here $\mathbb{E}$ denotes the expectation (average). The elements of $\mathbf{\m
 \end{equation}
 
 In most practical applications of \emph{Gaussian Processes} the mean function is often defined as $m(\mathbf{x}) = 0$, which is not unreasonable if the data is standardized to have zero mean. The central design issue now becomes choice of the function $K(\mathbf{x}, \mathbf{x}')$. The same constraints that apply to $\mathbf{\Lambda}$ also apply to the function $K(.,.)$. In machine learning, these symmetric positive definite functions of two variables are known as \emph{kernels}. Kernel based methods are applied extensively in data analysis i.e. regression, clustering, classification, density estimation (see \citet{Scholkopf:2001:LKS:559923}, \citet{hofmann2008}).
+
+\emph{Gaussian Processes} first appeared in machine learning research in \citet{Neal:1996:BLN:525544}, as the limiting case of Bayesian inference performed on neural networks with infinitely many neurons in the hidden layers. Although their inception in the machine learning community is recent, their origins can be traced back to the geo-statistics research community where they are known as \emph{Kriging} methods (\citet{krige1951statistical}). In pure mathematics area \emph{Gaussian Processes} have been studied extensively and their existence was first proven by Kolmogorov's extension theorem (\citet{tao2011introduction}). The reader is requested to refer to \cite{Rasmussen:2005:GPM:1162254} for an in depth treatment of Gaussian Processes in machine learning.
 
 \subsection{Gaussian Process Regression: Formulation}
 
@@ -256,7 +255,7 @@ With the multivariate normal distribution defined in equation \ref{eq:dist}, pro
     \Sigma_* & = & \mathbf{K}_{**} - \mathbf{K}^T_{*} \left(\mathbf{K} + \sigma^{2} \mathbf{I}\right)^{-1} \mathbf{K}_{*} \label{eq:posteriorcov}
 \end{eqnarray}
 
-The distribution of $\mathbf{f_*}| \mathbf{X},\mathbf{y},\mathbf{X_*}$ is known in Bayesian analysis research as the \emph{Posterior Predictive Distribution}. This illustrates a key difference between \emph{Gaussian Processes} and other regression models such as \emph{Neural Networks}, \emph{Linear Models} and \emph{Support Vector Machines}, that a \emph{Gaussian Process} model does not generate point predictions for new data but outputs a predictive distribution for the quantity sought, this allows us to construct error bars on the predictions. This property of Bayesian models such as \emph{Gaussian Processes} makes them suitable for Space Weather forecasting applications. 
+The distribution of $\mathbf{f_*}| \mathbf{X},\mathbf{y},\mathbf{X_*}$ is known in Bayesian analysis as the \emph{Posterior Predictive Distribution}. This illustrates a key difference between \emph{Gaussian Processes} and other regression models such as \emph{Neural Networks}, \emph{Linear Models} and \emph{Support Vector Machines}, that a \emph{Gaussian Process} model does not generate point predictions for new data but outputs a predictive distribution for the quantity sought, this allows us to construct error bars on the predictions. This property of Bayesian models such as \emph{Gaussian Processes} makes them suitable for Space Weather forecasting applications. 
 
 \subsection{Kernel Functions}
 
@@ -432,19 +431,31 @@ Figure \ref{fig:cc} shows the comparison of correlation coefficients between mod
 
 Figure \ref{fig:deltaDst} shows how the different models compare with respect to accuracy in predicting the peak value of $D_{st}$ during storm events ($\Delta Dst_{min}$ averaged over all storms). In the context of this metric the \emph{GP-ARX} model gives a $31\%$ improvement over the \emph{TL} model and $40\%$ over the \emph{NM} model. It is trivial to note that by definition, the \emph{Persistence} model ($\hat{D_{st}}(t) = D_{st}(t-1)$) will have $\Delta Dst_{min} = 0$ for every storm instance.
 
-Figure \ref{fig:timingErr} compares the time discrepancy of predicting the storm peak, again as seen above the \emph{Persistence} model will always have $\Delta t_{peak} = -1$. Two central themes come out of these charts.
+Figure \ref{fig:timingErr} compares the time discrepancy of predicting the storm peak, again as observed above the \emph{Persistence} model will always have $\Delta t_{peak} = -1$, the GP-AR and GP-ARX models give better performance than the other models in terms of timing error in prediction of storm peaks. 
 
+In figure \ref{fig:predictions} we show the OSA predictions generated by the TL, NM and GP-ARX models for one event from the list of storms in \citet{Ji2012}. This storm is interesting due to its strength ($Dst_{min} = -289 nT$) and the presence of two distinct peaks. In this particular event the GP-ARX model approximates the twin peaks as well as the onset and decay phases quite faithfully which is lacking in the NM and TL model predictions. The TL model recognises the presence of twin peaks but over estimates the second one as well as the decay phase, while the NM model is much delayed in the prediction of the initial peak and fails to approximate the time and intensity of the second peak.    
+
+\begin{figure}
+   \centering
+   \includegraphics[width=\textwidth]{Compare_pred.png}
+      \caption{Comparison of OSA predictions generated by the NM, TL and GP-ARX models for the storm event $9^{th}$ November $2004$ 11:00 UTC - $11^{th}$ November $2004$ 09:00 UTC}
+         \label{fig:predictions}
+   \end{figure}
+
+
+\begin{comment}
 \begin{enumerate}
     \item Persistence Behavior: It is clear that the \emph{persistence} behavior in the $D_{st}$ values is very strong i.e. the trivial predictive model $\hat{D_{st}}(t) = D_{st}(t-1)$ gives excellent performance. In fact it can be seen in these figures that the \emph{Persistence} model is outperforms every model compared by \citet{Ji2012} in the context of OSA prediction of $D_{st}$. Therefore any model that is proposed to tackle the OSA prediction problem for $D_{st}$ must be compared to and show visible gains over the \emph{Persistence} model.
     \item Assessment of Gaussian Process Models: The results indicate that there are many benefits to be gained by the application of Gaussian Process models for prediction of $D_{st}$. The \emph{GP-AR} and \emph{GP-ARX} not only outperform the models compared in \citet{Ji2012} but also the \emph{Persistence} model. 
 \end{enumerate}
-
+\end{comment}
   
 \section{Conclusions}
 
 We conclude this paper with three key conclusions/insights learned from our research so far.
    \begin{enumerate}
-      \item \emph{Persistence} model must be central in the model evaluation process in the context of \emph{One Step Ahead} prediction of the $D_{st}$ index. This is due to its excellent performance in terms of errors and correlations. 
+      \item \emph{Persistence} model must be central in the model evaluation process in the context of \emph{One Step Ahead} prediction of the $D_{st}$ index. It is clear that the \emph{persistence} behavior in the $D_{st}$ values is very strong i.e. the trivial predictive model $\hat{D_{st}}(t) = D_{st}(t-1)$ gives excellent performance. In fact it can be seen in \ref{sec:res} that the \emph{Persistence} model is outperforms every model compared by \citet{Ji2012} in the context of OSA prediction of $D_{st}$. Therefore any model that is proposed to tackle the OSA prediction problem for $D_{st}$ must be compared to the \emph{Persistence} model and show visible gains above it.
+      
       \item \emph{Gaussian Process} AR and ARX models give encouraging benefits in OSA prediction even when compared to the \emph{Persistence} model. Leveraging the strengths of the Bayesian approach, they are able to learn robust predictors from data. 
       
       If one compares the training sets used by the models, one can appreciate that they are able to learn robust models for prediction with relatively small training and validations sets (training set contains 250 instances, while the validation set contains 432 instances) on the other hand the \emph{NM} model uses one year (8760 instances) of data to learn the formula outlined in \citet{balikhin:narmax} and the \emph{TL} model uses six years of data (52560 instances) for training. 
