@@ -205,10 +205,6 @@ Here $\mathbb{E}$ denotes the expectation (average). The elements of $\mathbf{\m
     f(\mathbf{x}) \sim \mathcal{GP}(m(\mathbf{x}), K(\mathbf{x}, \mathbf{x}'))
 \end{equation}
 
-In most practical applications of \emph{Gaussian Processes} the mean function is often defined as $m(\mathbf{x}) = 0$, which is not unreasonable if the data is standardized to have zero mean. The central design issue now becomes choice of the function $K(\mathbf{x}, \mathbf{x}')$. The same constraints that apply to $\mathbf{\Lambda}$ also apply to the function $K(.,.)$. In machine learning, these symmetric positive definite functions of two variables are known as \emph{kernels}. Kernel based methods are applied extensively in data analysis i.e. regression, clustering, classification, density estimation (see \citet{Scholkopf:2001:LKS:559923}, \citet{hofmann2008}).
-
-\emph{Gaussian Processes} first appeared in machine learning research in \citet{Neal:1996:BLN:525544}, as the limiting case of Bayesian inference performed on neural networks with infinitely many neurons in the hidden layers. Although their inception in the machine learning community is recent, their origins can be traced back to the geo-statistics research community where they are known as \emph{Kriging} methods (\citet{krige1951statistical}). In pure mathematics area \emph{Gaussian Processes} have been studied extensively and their existence was first proven by Kolmogorov's extension theorem (\citet{tao2011introduction}). The reader is requested to refer to \cite{Rasmussen:2005:GPM:1162254} for an in depth treatment of Gaussian Processes in machine learning.
-
 \subsection{Gaussian Process Regression: Formulation}
 
 \begin{eqnarray}
@@ -256,6 +252,10 @@ With the multivariate normal distribution defined in equation \ref{eq:dist}, pro
 \end{eqnarray}
 
 The distribution of $\mathbf{f_*}| \mathbf{X},\mathbf{y},\mathbf{X_*}$ is known in Bayesian analysis as the \emph{Posterior Predictive Distribution}. This illustrates a key difference between \emph{Gaussian Processes} and other regression models such as \emph{Neural Networks}, \emph{Linear Models} and \emph{Support Vector Machines}, that a \emph{Gaussian Process} model does not generate point predictions for new data but outputs a predictive distribution for the quantity sought, this allows us to construct error bars on the predictions. This property of Bayesian models such as \emph{Gaussian Processes} makes them suitable for Space Weather forecasting applications. 
+
+\emph{Gaussian Processes} first appeared in machine learning research in \citet{Neal:1996:BLN:525544}, as the limiting case of Bayesian inference performed on neural networks with infinitely many neurons in the hidden layers. Although their inception in the machine learning community is recent, their origins can be traced back to the geo-statistics research community where they are known as \emph{Kriging} methods (\citet{krige1951statistical}). In pure mathematics area \emph{Gaussian Processes} have been studied extensively and their existence was first proven by Kolmogorov's extension theorem (\citet{tao2011introduction}). The reader is requested to refer to \cite{Rasmussen:2005:GPM:1162254} for an in depth treatment of Gaussian Processes in machine learning.
+
+In most practical applications of \emph{Gaussian Processes} the mean function is often defined as $m(\mathbf{x}) = 0$, which is not unreasonable if the data is standardized to have zero mean. The central design issue now becomes choice of the function $K(\mathbf{x}, \mathbf{x}')$. The same constraints that apply to $\mathbf{\Lambda}$ also apply to the function $K(.,.)$. In machine learning, these symmetric positive definite functions of two variables are known as \emph{kernels}. Kernel based methods are applied extensively in data analysis i.e. regression, clustering, classification, density estimation (see \citet{Scholkopf:2001:LKS:559923}, \citet{hofmann2008}).
 
 \subsection{Kernel Functions}
 
@@ -340,7 +340,7 @@ Model selection of \emph{GP-AR} and \emph{GP-ARX} is performed by grid search me
 \begin{figure}
    \centering
    \includegraphics[width=\textwidth]{Compare_RMSE.png}
-      \caption{Averaged RMSE}
+      \caption{Averaged RMSE performance of GP-AR, GP-ARX and the Persistence model versus results in \citet{Ji2012}.}
          \label{fig:rmse}
    \end{figure}
 
@@ -359,7 +359,7 @@ Model selection of \emph{GP-AR} and \emph{GP-ARX} is performed by grid search me
 \begin{figure}
    \centering
    \includegraphics[width=\textwidth]{Compare_RelProb.png}
-   \caption{Comparison of empirical distribution of relative errors for various models on the list of 63 storms in \citet{Ji2012}.}
+   \caption{Comparison of empirical distribution of relative errors for GP-AR, GP-ARX, NM and TL on the test set of \citet{Ji2012}.}
    \label{fig:relprob}
 \end{figure}
 
@@ -398,7 +398,7 @@ For the purpose of generating the cumulative probability plots of the model erro
 \begin{figure}
    \centering
    \includegraphics[width=\textwidth]{Compare_CC.png}
-      \caption{Averaged Cross correlation coefficient}
+      \caption{Averaged cross correlation performance of GP-AR, GP-ARX and the Persistence model versus results in \citet{Ji2012}.}
          \label{fig:cc}
    \end{figure}
 
@@ -410,7 +410,7 @@ With respect to the \emph{TL} model one important concern must be expressed. The
 \begin{figure}
    \centering
    \includegraphics[width=\textwidth]{Compare_deltaDst.png}
-      \caption{Averaged $\Delta Dst_{min}$}
+      \caption{Averaged $\Delta Dst_{min}$ of GP-AR, GP-ARX and the Persistence model versus results in \citet{Ji2012}.}
          \label{fig:deltaDst}
    \end{figure}
 
@@ -418,33 +418,46 @@ With respect to the \emph{TL} model one important concern must be expressed. The
 
 \section{Results} \label{sec:res}
 %%  This two-panel figure was inserted by JFW to demonstrate the subfigure and epstopdf packages
-\begin{figure}
-   \centering
-   \includegraphics[width=\textwidth]{Compare_timingerr.png}
-      \caption{Averaged absolute timing error}
-         \label{fig:timingErr}
-   \end{figure}
-
-
 
 Figures \ref{fig:rmse}, \ref{fig:cc}, \ref{fig:deltaDst} and \ref{fig:timingErr} compare the performance of \emph{GP-AR}, \emph{GP-ARX} and the \emph{Persistence} model with the existing results of \citet{Ji2012}. Figure \ref{fig:rmse} compares the average RMSE of the models over the list of 63 storms, we can see that the \emph{GP-ARX} model gives an improvement of approximately $38\%$ in RMSE with respect to the \emph{TL} model and $60\%$ improvement with respect to the \emph{NM} model. 
 
 Figure \ref{fig:relprob} compares the empirical distributions of absolute relative model errors across all storm events in the experiments. If one chooses a $95\%$ probability bound then it can be seen that the \emph{GP-ARX} model bounds the relative error to $20\%$ of the actual $D_{st}$ value, while in the case of the \emph{NM} model it bounds the relative error to $50\%$ of the actual $D_{st}$ value. Therefore the \emph{GP-ARX} model gives an approximate improvement of $25\%$ over the other compared models on the test data set chosen.
 
+
+\begin{figure}
+   \centering
+   \includegraphics[width=\textwidth]{Compare_timingerr.png}
+      \caption{Averaged absolute timing error of GP-AR, GP-ARX and the Persistence model versus results in \citet{Ji2012}.}
+         \label{fig:timingErr}
+   \end{figure}
+
+
+
+
 Figure \ref{fig:cc} shows the comparison of correlation coefficients between model predictions and actual $D_{st}$ values. From the results of \citet{Ji2012}, the \emph{TL} model gives the highest correlation coefficient of $94\%$, but that is not surprising considering the fact that there is a large overlap between the training data used to train it and storm events. This is also the case in \ref{fig:relprob} where we average predictions generated from a pre-trained instance of the \emph{TL} model. Even so the \emph{GP-ARX} model gives comparable correlation coefficient to \emph{TL} a testimony to its performance given that its training set has no overlap with the storm events.
-
-Figure \ref{fig:deltaDst} shows how the different models compare with respect to accuracy in predicting the peak value of $D_{st}$ during storm events ($\Delta Dst_{min}$ averaged over all storms). In the context of this metric the \emph{GP-ARX} model gives a $31\%$ improvement over the \emph{TL} model and $40\%$ over the \emph{NM} model. It is trivial to note that by definition, the \emph{Persistence} model ($\hat{D_{st}}(t) = D_{st}(t-1)$) will have $\Delta Dst_{min} = 0$ for every storm instance.
-
-Figure \ref{fig:timingErr} compares the time discrepancy of predicting the storm peak, again as observed above the \emph{Persistence} model will always have $\Delta t_{peak} = -1$, the GP-AR and GP-ARX models give better performance than the other models in terms of timing error in prediction of storm peaks. 
-
-In figure \ref{fig:predictions} we show the OSA predictions generated by the TL, NM and GP-ARX models for one event from the list of storms in \citet{Ji2012}. This storm is interesting due to its strength ($Dst_{min} = -289 nT$) and the presence of two distinct peaks. In this particular event the GP-ARX model approximates the twin peaks as well as the onset and decay phases quite faithfully which is lacking in the NM and TL model predictions. The TL model recognises the presence of twin peaks but over estimates the second one as well as the decay phase, while the NM model is much delayed in the prediction of the initial peak and fails to approximate the time and intensity of the second peak.    
 
 \begin{figure}
    \centering
    \includegraphics[width=\textwidth]{Compare_pred.png}
       \caption{Comparison of OSA predictions generated by the NM, TL and GP-ARX models for the storm event $9^{th}$ November $2004$ 11:00 UTC - $11^{th}$ November $2004$ 09:00 UTC}
          \label{fig:predictions}
-   \end{figure}
+\end{figure}
+
+
+Figure \ref{fig:deltaDst} shows how the different models compare with respect to accuracy in predicting the peak value of $D_{st}$ during storm events ($\Delta Dst_{min}$ averaged over all storms). In the context of this metric the \emph{GP-ARX} model gives a $31\%$ improvement over the \emph{TL} model and $40\%$ over the \emph{NM} model. It is trivial to note that by definition, the \emph{Persistence} model ($\hat{D_{st}}(t) = D_{st}(t-1)$) will have $\Delta Dst_{min} = 0$ for every storm instance.
+
+Figure \ref{fig:timingErr} compares the time discrepancy of predicting the storm peak, again as observed above the \emph{Persistence} model will always have $\Delta t_{peak} = -1$, the GP-AR and GP-ARX models give better performance than the other models in terms of timing error in prediction of storm peaks. 
+
+In figure \ref{fig:predictions} we show the OSA predictions generated by the TL, NM and GP-ARX models for one event from the list of storms in \citet{Ji2012}. This storm is interesting due to its strength ($Dst_{min} = -289 nT$) and the presence of two distinct peaks. In this particular event the GP-ARX model approximates the twin peaks as well as the onset and decay phases quite faithfully which is lacking in the NM and TL model predictions. The TL model recognises the presence of twin peaks but over estimates the second one as well as the decay phase, while the NM model is much delayed in the prediction of the initial peak and fails to approximate the time and intensity of the second peak.
+
+
+
+\begin{figure}
+   \centering
+   \includegraphics[width=\textwidth]{Compare_pred_err_bar.png}
+      \caption{OSA predictions with error bars $\pm 1$ standard deviation, generated by the GP-ARX model for the storm event $9^{th}$ November $2004$ 11:00 UTC - $11^{th}$ November $2004$ 09:00 UTC}
+         \label{fig:predictionswitherrorbar}
+\end{figure}
 
 
 \begin{comment}
