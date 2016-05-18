@@ -82,11 +82,9 @@
 
 \begin{linenumbers}
 
-   \title{Gaussian Processes Autoregressive Models for the Disturbance Storm Time Index}
+   \title{Gaussian Processes Autoregressive Models for Forecasting the Disturbance Storm Time Index}
 
-   \subtitle{Attaining performance over and above persistence behavior}
-   
-   \titlerunning{Gaussian Process $D_{st}$ models}
+   \titlerunning{Gaussian Process $Dst$ models}
 
    \authorrunning{Chandorkar and Camporeale}
 
@@ -110,17 +108,17 @@
    
    
    \abstract{
-    We aim to improve the state of the art of \emph{One Step Ahead}(OSA) prediction of the $D_{st}$ geomagnetic activity index. In the domain of OSA prediction, it is well known that $D_{st}(t)$ values correlate strongly with values one hour in the past (i.e. $D_{st}(t-1)$). While a number of forecasting models have been proposed and compared, none of them have been compared with the \emph{Persistence} model to quantify their performance improvements above this most trivial of predictors. In this study we train Gaussian Process regression models for One Step Ahead (OSE) prediction of the Disturbance Storm Time ($D_{st}$) geomagnetic index. We propose three variants of the Gaussian Process model.
+    We present two models that improve the state of the art of \emph{One Step Ahead}(OSA) prediction of the $Dst$ geomagnetic activity index. In the domain of OSA prediction, it is well known that $Dst(t)$ values correlate strongly with values one hour in the past (i.e. $Dst(t-1)$). While a number of forecasting models have been proposed and compared, none of them have been compared with the \emph{Persistence} model to quantify their performance improvements above this most trivial of predictors. In this study we train Gaussian Process regression models for One Step Ahead (OSE) prediction of the Disturbance Storm Time ($Dst$) geomagnetic index. We propose two variants of the Gaussian Process model.
     \begin{enumerate*}
       \item Gaussian Process Auto regressive (GP-AR) 
       \item Gaussian Process Auto regressive with eXogenous inputs (GP-ARX). 
     \end{enumerate*}
-    We compare the performance of these models with the current state of the art in one step ahead $D_{st}$ prediction on a set of 
+    We compare the performance of these models with the current state of the art in one step ahead $Dst$ prediction on a set of 
     63 benchmark storms from 1998-2006. The proposed Gaussian Process models not only outperform the rest but also the \emph{Persistence} model.
     }
 
    \keywords{Geomagnetic indices --
-            $D_{st}$ OSA Prediction --
+            $Dst$ OSA Prediction --
             Gaussian Processes --
             Machine Learning
             }
@@ -131,46 +129,44 @@
 
 \section{Introduction}
 
-The Sun is the principal driver of Space Weather, the steady solar wind and intermittent bursts of hot plasma from its corona (Coronal Mass Ejections \emph{CME}) are the causes of several observed phenomena in the Earths Magnetosphere such as but not limited to \emph{Aurora Borealis}, \emph{Aurora Australis}, \emph{Van Allen Currents}, geomagnetic storms etc.
+The magnetosphere's dynamics and its associated solar wind driver form a complex nonlinear coupled dynamical system. It is therefore not only instructive but also greatly simplifying to use representative indices to quantify the state of geomagnetic activity.
 
-Although the qualitative bifurcation of these phenomena is well understood and each has been studied in depth, the magnetosphere's dynamics and its associated solar wind driver form a complex nonlinear coupled dynamical system. It is therefore not only instructive but also greatly simplifying to use representative indices to quantify the state of geomagnetic activity.
-
-Geomagnetic indices come in various forms, they may take continuous or discreet values. Their values are often calculated by averaging or combining a number of readings taken by instruments around the Earth. Each geomagnetic index is a proxy for a particular kind of phenomena. Some popular indices are the $K_p$, $D_{st}$ and the AE index.
+Geomagnetic indices come in various forms, they may take continuous or discrete values. Their values are often calculated by averaging or combining a number of readings taken by instruments around the Earth. Each geomagnetic index is a proxy for a particular kind of phenomena. Some popular indices are the $K_p$, $Dst$ and the $AE$ index.
 
 \begin{comment}
 \begin{enumerate}
-    \item $K_p$: The Kp-index is a discreet valued global geomagnetic storm index and is based on 3 hour measurements of the K-indices, for a given value, for each of the past days. The K-index itself is a three hour long quasi-logarithmic local index of the geomagnetic activity, relative to a calm day curve for the given location.
+    \item $K_p$: The Kp-index is a discrete valued global geomagnetic storm index and is based on 3 hour measurements of the K-indices, for a given value, for each of the past days. The K-index itself is a three hour long quasi-logarithmic local index of the geomagnetic activity, relative to a calm day curve for the given location.
     
     \item AE: The Auroral Electrojet Index, AE, is designed to provide a global, quantitative measure of auroral zone magnetic activity produced by enhanced Ionospheric currents flowing below and within the auroral oval.
     
-    \item $D_{st}$: A continuous hourly index which measures the weakening of the Earths magnetic field due to ring currents. 
+    \item $Dst$: A continuous hourly index which measures the weakening of the Earths magnetic field due to ring currents. 
 \end{enumerate}
 \end{comment}
 
 %Talk about Burton and friends
-We focus on prediction of the hourly $D_{st}$ index which is an important problem because $D_{st}$ is a straightforward indicator of geomagnetic storms. More specifically we focus on the \emph{one step ahead} (OSA) prediction of $D_{st}$ because it is the first step towards building long term predictions of geomagnetic response of the Earth to changing space weather conditions. 
+We focus on prediction of the hourly $Dst$ index which is an important problem because $Dst$ is a straightforward indicator of geomagnetic storms. More specifically we focus on the \emph{one step ahead} (OSA) prediction of $Dst$ because it is the first step towards building long term predictions of geomagnetic response of the Earth to changing space weather conditions. 
 
-The $D_{st}$ OSA prediction problem has been the subject of several modeling efforts so far, some of the earliest are by \citet{JGR:JGR10260} who outlined a prediction framework that has been used as a starting point for many $D_{st}$ models. \citet{JGR:JGR10260} model $D_{st}(t)$ a function of time using an \emph{Ordinary Differential Equation} (ODE) which expressed it's rate of change as a combination of two terms: decay and injection $\frac{d D_{st}(t)}{dt} = Q(t) - \frac{D_{st}(t)}{\tau}$. 
+The $Dst$ OSA prediction problem has been the subject of several modeling efforts so far, some of the earliest are by \citet{JGR:JGR10260} who outlined a prediction framework that has been used as a starting point for many $Dst$ models. \citet{JGR:JGR10260} model $Dst(t)$ a function of time using an \emph{Ordinary Differential Equation} (ODE) which expressed it's rate of change as a combination of two terms: decay and injection $\frac{d Dst(t)}{dt} = Q(t) - \frac{Dst(t)}{\tau}$. 
 
 The \citet{JGR:JGR10260} model has proven to be very influential in the Space Weather research effort and many subsequent works like \citet{Wang:Dst}, \citet{JGRA:JGRA14856} modified the proposed ODE by proposing expressions for the injection term $Q(t)$. More recently \citet{Ballatore2014} have tried to generate empirical estimates for the injection and decay terms in Burton's equation.
 
 %Talk about NARMAX Dst
-Among the other major empirical models used to predict $D_{st}$ has been the \emph{Nonlinear Auto-Regessive Moving Average with eXogenous inputs} (NARMAX) methodology developed in \citet{doi:10.1080/00207178908559767}, \citet{GRL:GRL13494}, \citet{GRL:GRL20944}, \citet{JGRA:JGRA18657}, \citet{balikhin:narmax}, \citet{JGRA:JGRA20661} and \citet{JGRA:JGRA50192}. The NARMAX methodology builds models by constructing polynomial expansions of inputs and determines the best combinations or monomials to include in the refined model using the \emph{error reduction ratio} (ERR) criterion. The parameters of the NARMAX OLS-ERR model are calculated using the standard \emph{ordinary least squares} (OLS) method hence these methods are also denoted by the acronym NARMAX OLS-ERR. The reader may refer to \citet{billings2013nonlinear} for a detailed exposition of the NARMAX methodology.
+Among the other major empirical models used to predict $Dst$ has been the \emph{Nonlinear Auto-Regessive Moving Average with eXogenous inputs} (NARMAX) methodology developed in \citet{doi:10.1080/00207178908559767}, \citet{GRL:GRL13494}, \citet{GRL:GRL20944}, \citet{JGRA:JGRA18657}, \citet{balikhin:narmax}, \citet{JGRA:JGRA20661} and \citet{JGRA:JGRA50192}. The NARMAX methodology builds models by constructing polynomial expansions of inputs and determines the best combinations or monomials to include in the refined model using the \emph{error reduction ratio} (ERR) criterion. The parameters of the NARMAX OLS-ERR model are calculated using the standard \emph{ordinary least squares} (OLS) method hence these methods are also denoted by the acronym NARMAX OLS-ERR. The reader may refer to \citet{billings2013nonlinear} for a detailed exposition of the NARMAX methodology.
 
 %Talk about neural networks
-\emph{Neural Networks} have been a popular choice for building predictive models and researchers employed the standard \emph{feed forward} and the more specialized \emph{recurrent} architectures. \citet{Lund} proposed an \emph{Elman} recurrent network architecture called Lund $D_{st}$, which used the solar wind, \emph{interplanetary magnetic field} (IMF) and historical $D_{st}$ data. \citet{SWE:SWE286} originally proposed a \emph{feed forward} network for predicting the $K_p$ index which used the \emph{Boyle coupling function} (\citet{boyle1997empirical}), in \citet{SWE:SWE286} the same architecture is adapted for prediction of $D_{st}$, which is popularly known as the Rice $D_{st}$ model. \citet{pallocchia:hal-00318011} proposed a \emph{neural network} model called EDDA to predict $D_{st}$ using only the IMF data.
+\emph{Neural Networks} have been a popular choice for building predictive models and researchers employed the standard \emph{feed forward} and the more specialized \emph{recurrent} architectures. \citet{Lund} proposed an \emph{Elman} recurrent network architecture called Lund $Dst$, which used the solar wind, \emph{interplanetary magnetic field} (IMF) and historical $Dst$ data. \citet{SWE:SWE286} originally proposed a \emph{feed forward} network for predicting the $K_p$ index which used the \emph{Boyle coupling function} (\citet{boyle1997empirical}), in \citet{SWE:SWE286} the same architecture is adapted for prediction of $Dst$, which is popularly known as the Rice $Dst$ model. \citet{pallocchia:hal-00318011} proposed a \emph{neural network} model called EDDA to predict $Dst$ using only the IMF data.
 
 %Talk about comparison papers, number of storms covered and Persistence
-In light of the extensive list of modeling techniques employed for prediction of geomagnetic indices and in particular $D_{st}$, model comparison and evaluation becomes a crucial direction in advancing the research domain. \citet{Rastatter2013} compare several physics based (convection, kinetic and magneto hydrodynamic) and empirical prediction models such as Narmax, Rice $D_{st}$ on 4 storm events which occurred between 2001 and 2006. \citet{Amata2008} compares the EDDA and the Lund $D_{st}$ models over the 2003-2005 period. But the most extensive model comparison in terms of storm events was conducted in \citet{Ji2012} which compared seven $D_{st}$ models (see table \ref{table:DstModels}) on a list of 63 geomagnetic storm events of varying intensities which occurred between 1998 and 2006. 
+In light of the extensive list of modeling techniques employed for prediction of geomagnetic indices and in particular $Dst$, model comparison and evaluation becomes a crucial direction in advancing the research domain. \citet{Rastatter2013} compare several physics based (convection, kinetic and magneto hydrodynamic) and empirical prediction models such as Narmax, Rice $Dst$ on 4 storm events which occurred between 2001 and 2006. \citet{Amata2008} compares the EDDA and the Lund $Dst$ models over the 2003-2005 period. But the most extensive model comparison in terms of storm events was conducted in \citet{Ji2012} which compared seven $Dst$ models (see table \ref{table:DstModels}) on a list of 63 geomagnetic storm events of varying intensities which occurred between 1998 and 2006. 
 
 %Vision
-In $D_{st}$ prediction a seemingly trivial yet highly informative prediction method known as the \emph{Persistence} model has been largely ignored in its crucial role in model evaluation. The \emph{Persistence} model is stated simply as using the previous value of $D_{st}$ as the prediction for the next time step ($\hat{D_{st}}(t) = D_{st}(t-1)$). Due to high auto correlation between $D_{st}(t)$ and $D_{st}(t-1)$ in the Omni data, the \emph{Persistence} model gives excellent predictive performance despite its apparent lack of sophistication. In essence it is a trivial hypothesis and hence must always be used as a base line to compare the performance of any proposed $D_{st}$ algorithm. Therefore in the context of OSA prediction, a model must outperform the \emph{Persistence} model in order to be a viable candidate for advancing the science of space weather prediction.
+In $Dst$ prediction a seemingly trivial yet highly informative prediction method known as the \emph{Persistence} model has been largely ignored in its crucial role in model evaluation. The \emph{Persistence} model is stated simply as using the previous value of $Dst$ as the prediction for the next time step ($\hat{Dst}(t) = Dst(t-1)$). Due to high auto correlation between $Dst(t)$ and $Dst(t-1)$ in the Omni data, the \emph{Persistence} model gives excellent predictive performance despite its apparent lack of sophistication. In essence it is a trivial hypothesis and hence must always be used as a base line to compare the performance of any proposed $Dst$ algorithm. Therefore in the context of OSA prediction, a model must outperform the \emph{Persistence} model in order to be a viable candidate for advancing the science of space weather prediction.
 
 %Assertion
-It is with the above observation in mind, we propose \emph{Gaussian Process} models for OSA prediction of $D_{st}$. We use the results of \citet{Ji2012} as a starting point and compare our proposed models with the methods outlined in the same paper while using the performance of the \emph{Persistence} model as a litmus test. 
+It is with the above observation in mind, we propose \emph{Gaussian Process} models for OSA prediction of $Dst$. We use the results of \citet{Ji2012} as a starting point and compare our proposed models with the methods outlined in the same paper while using the performance of the \emph{Persistence} model as a litmus test. 
 
 % Talk about Gaussian Process
-We use the hourly resolution Omni data set (see \cite{OmniPaper}) as extracted from NASA/GSFC's OMNI data set through OMNIWeb. The rest of the paper is organized as follows. Section \ref{sec:method} gives an introduction to the \emph{Gaussian Process} methodology for regression and the various issues surrounding their application. In section \ref{sec:osa} two different \emph{Gaussian Process} auto-regressive models are proposed and subsequently in sections \ref{sec:exp} and \ref{sec:res}, bench marked against the \emph{Persistence} $D_{st}$ model as well as other models outlined in \citet{Ji2012}.
+We use the hourly resolution Omni data set (see \cite{OmniPaper}) as extracted from NASA/GSFC's OMNI data set through OMNIWeb. The rest of the paper is organized as follows. Section \ref{sec:method} gives an introduction to the \emph{Gaussian Process} methodology for regression and the various issues surrounding their application. In section \ref{sec:osa} two different \emph{Gaussian Process} auto-regressive models are proposed and subsequently in sections \ref{sec:exp} and \ref{sec:res}, bench marked against the \emph{Persistence} $Dst$ model as well as other models outlined in \citet{Ji2012}.
 
   
 \section{Methodology: Gaussian Process} \label{sec:method}
@@ -261,7 +257,7 @@ In most practical applications of \emph{Gaussian Processes} the mean function is
 
 For the success of a Gaussian Process model an appropriate choice of kernel function is paramount. The symmetry and positive semi-definiteness of \emph{Gaussian Process} kernels implies that they represent inner-products between some basis function representation of the data. This is analogous to a Fourier series decomposition in Physics. The interested reader is suggested to refer to \cite{Berlinet2004}, \citet{Scholkopf:2001:LKS:559923} and \citet{hofmann2008} for a thorough treatment on kernel functions and the rich theory behind them. Some common kernel functions used in machine learning include the radial basis function (RBF) kernel $K(\mathbf{x}, \mathbf{y}) = \frac{1}{2} exp(-||\mathbf{x} - \mathbf{y}||^2/l^2)$ and the polynomial kernel $K(\mathbf{x}, \mathbf{y}) = (\mathbf{x}^\intercal \mathbf{y} + b)^d$. 
 
-The quantities $l$ in the RBF, $b$ and $d$ in the polynomial kernel are known as \emph{hyper-parameters}. Hyper-parameters give flexibility to particular kernel structure, for example $d = 1, 2, 3, \cdots$ in the polynomial kernel represents linear, quadratic, cubic and higher order phenomena respectively. The method of assigning values to the \emph{hyper-parameter} is crucial in the model building process (see section \ref{sec:hyp} below). In this study, we construct Gaussian Process regression models with polynomial kernels for \emph{one step ahead} prediction of the $D_{st}$ index. 
+The quantities $l$ in the RBF, $b$ and $d$ in the polynomial kernel are known as \emph{hyper-parameters}. Hyper-parameters give flexibility to particular kernel structure, for example $d = 1, 2, 3, \cdots$ in the polynomial kernel represents linear, quadratic, cubic and higher order phenomena respectively. The method of assigning values to the \emph{hyper-parameter} is crucial in the model building process (see section \ref{sec:hyp} below). In this study, we construct Gaussian Process regression models with polynomial kernels for \emph{one step ahead} prediction of the $Dst$ index. 
 
 \begin{comment}
 \subsubsection{Radial Basis Function (RBF)}
@@ -297,35 +293,35 @@ In this study we employ \emph{grid search} to find the best performing set of hy
 
 \section{One Step Ahead Prediction} \label{sec:osa}
 
-Below in equations \ref{eq:Dst}, \ref{eq:GPNoise}, \ref{eq:DstGP}, \ref{eq:GPPoly} we outline a \emph{Gaussian Process} formulation for \emph{OSA} prediction of $D_{st}$. A vector of features $x_{t-1}$ is used as input to an unknown function $f(x_{t-1})$ which drawn from a \emph{Gaussian Process} driven by a linear polynomial kernel. 
+Below in equations \ref{eq:Dst}, \ref{eq:GPNoise}, \ref{eq:DstGP}, \ref{eq:GPPoly} we outline a \emph{Gaussian Process} formulation for \emph{OSA} prediction of $Dst$. A vector of features $x_{t-1}$ is used as input to an unknown function $f(x_{t-1})$ which drawn from a \emph{Gaussian Process} driven by a linear polynomial kernel. 
 
-The features $x_{t-1}$ can be any collection of quantities in the hourly resolution Omni data set. Generally $x_{t-1}$ are time histories of $D_{st}$ or other important variables examples being plasma pressure $p(t)$, solar wind speed $V(t)$, z component of the interplanetary magnetic field $B_z(t)$.
+The features $x_{t-1}$ can be any collection of quantities in the hourly resolution Omni data set. Generally $x_{t-1}$ are time histories of $Dst$ or other important variables examples being plasma pressure $p(t)$, solar wind speed $V(t)$, z component of the interplanetary magnetic field $B_z(t)$.
 
 \begin{eqnarray}
-    D_{st}(t) & = & f(\mathbf{x}_{t-1}) + \epsilon \label{eq:Dst} \\
+    Dst(t) & = & f(\mathbf{x}_{t-1}) + \epsilon \label{eq:Dst} \\
     \epsilon & \sim & \mathcal{N}(0, \sigma^2) \label{eq:GPNoise} \\
     f(x_t) & \sim & \mathcal{GP}(m(\mathbf{x}_t), K(\mathbf{x}_t, \mathbf{x}_s)) \label{eq:DstGP} \\
     K(\mathbf{x}, \mathbf{y}) & = & \mathbf{x}^\intercal \mathbf{y} + b \label{eq:GPPoly}
 \end{eqnarray}
 
-In \ref{sec:gpar} and \ref{sec:gparx} below we consider two choices for the input features $\mathbf{x}_{t-1}$ leading to two variants of \emph{Gaussian Process} regression for $D_{st}$ time series prediction.
+In \ref{sec:gpar} and \ref{sec:gparx} below we consider two choices for the input features $\mathbf{x}_{t-1}$ leading to two variants of \emph{Gaussian Process} regression for $Dst$ time series prediction.
 
 \subsection{Gaussian Process Auto-Regressive (GP-AR)} \label{sec:gpar}
 
-The simplest auto-regressive models for \emph{OSA} prediction of $D_{st}$ are those that use only the history of $D_{st}$ to construct input features for model training. The input features $\mathbf{x}_{t-1}$ at each time step is the history of $D_{st}(t)$ until a time lag of $p$ steps.
+The simplest auto-regressive models for \emph{OSA} prediction of $Dst$ are those that use only the history of $Dst$ to construct input features for model training. The input features $\mathbf{x}_{t-1}$ at each time step is the history of $Dst(t)$ until a time lag of $p$ steps.
 
 \begin{eqnarray*}
-    \mathbf{x}_t & = & \left(D_{st}(t), D_{st}(t-1), \cdots , D_{st}(t-p+1)\right)
+    \mathbf{x}_t & = & \left(Dst(t), Dst(t-1), \cdots , Dst(t-p+1)\right)
 \end{eqnarray*}
 
 \subsection{Gaussian Process Auto-Regressive with eXogenous inputs (GP-ARX)} \label{sec:gparx}
 
 Auto-regressive models can be improved by including exogenous quantities that can help in improving predictions. It is well known that the solar wind and interplanetary magnetic field are important factors that influence the Earth's geomagnetic state.
 
-Hourly solar wind velocity $V(t)$ and interplanetary magnetic field $B_z(t)$ recorded at the ACE satellite are used as the exogenous inputs of the model, along with the time history of $D_{st}$. In this model we choose distinct time lags $p$ and $p_{ex}$ for auto-regressive and exogenous variables respectively.
+Hourly solar wind velocity $V(t)$ and interplanetary magnetic field $B_z(t)$ recorded at the ACE satellite are used as the exogenous inputs of the model, along with the time history of $Dst$. In this model we choose distinct time lags $p$ and $p_{ex}$ for auto-regressive and exogenous variables respectively.
     
 \begin{eqnarray*}
-        & \mathbf{x}_t & = (D_{st}(t), D_{st}(t-1), \cdots , D_{st}(t-p+1), \\
+        & \mathbf{x}_t & = (Dst(t), Dst(t-1), \cdots , Dst(t-p+1), \\
         & \ \ \ \ \ & V(t), V(t-1), \cdots, V(t-p_{ex}+1),\\
         & \ \ \ \ \ & B_{z}(t), B_{z}(t-1), \cdots, B_{z}(t-p_{ex}+1),\\
         & \ \ \ \ \ & V B_{z}(t), V B_{z}(t-1), \cdots, V B_{z}(t-p_{ex}+1))
@@ -333,7 +329,7 @@ Hourly solar wind velocity $V(t)$ and interplanetary magnetic field $B_z(t)$ rec
 
 \section{Model Training and Validation}
 
-Before performance bench marks for \emph{OSA} $D_{st}$ prediction are run on the storm events in \cite{Ji2012}, training and model selection of \emph{GP-AR} and \emph{GP-ARX} models on independent data sets must be performed. For this purpose we choose segments 00:00 1 January 2008 - 10:00 11 January 2008 for training and 00:00 15 November 2014 - 23:00 1 December 2014 for model selection.
+Before performance bench marks for \emph{OSA} $Dst$ prediction are run on the storm events in \cite{Ji2012}, training and model selection of \emph{GP-AR} and \emph{GP-ARX} models on independent data sets must be performed. For this purpose we choose segments 00:00 1 January 2008 - 10:00 11 January 2008 for training and 00:00 15 November 2014 - 23:00 1 December 2014 for model selection.
 
 Model selection of \emph{GP-AR} and \emph{GP-ARX} is performed by grid search methodology and the root mean square error (\emph{RMSE}) on the validation set is used to select the values of the model hyper-parameters. The time lags chosen for \emph{GP-AR} are $p = 6$ while for \emph{GP-ARX} $p=6$, $p_{ex} = 1$ are arrived by experimenting with values starting from one and choosing the value of $p$ yielding best performance on the 63 events in the bench mark.   
 
@@ -346,12 +342,12 @@ Model selection of \emph{GP-AR} and \emph{GP-ARX} is performed by grid search me
 
 \section{Experiments} \label{sec:exp}
 
-\citet{Ji2012} compare a six OSA $D_{st}$ models in their paper by compiling a list of 63 geomagnetic storm events of varying strengths which occurred from 1998-2006. This serves as an important stepping stone for a systematic comparison of existing and new prediction techniques because performance metrics are averaged over a large number of storm events that occurred over a 8 year period. They compare the averaged performance of these models on four key performance metrics.
+\citet{Ji2012} compare a six OSA $Dst$ models in their paper by compiling a list of 63 geomagnetic storm events of varying strengths which occurred from 1998-2006. This serves as an important stepping stone for a systematic comparison of existing and new prediction techniques because performance metrics are averaged over a large number of storm events that occurred over a 8 year period. They compare the averaged performance of these models on four key performance metrics.
 
 \begin{enumerate}
     \item $RMSE$: The root mean square error
-    \item $CC$: Correlation coefficient between the predicted and actual value of $D_{st}$
-    \item $\Delta Dst_{min}$: The error in prediction of the peak value of $D_{st}$ for a storm event.
+    \item $CC$: Correlation coefficient between the predicted and actual value of $Dst$
+    \item $\Delta Dst_{min}$: The error in prediction of the peak value of $Dst$ for a storm event.
     \item $|\Delta t_{peak}|$: The error in predicting the timing of a storm peak, also called \emph{timing error}. 
 \end{enumerate}
 
@@ -364,17 +360,17 @@ Model selection of \emph{GP-AR} and \emph{GP-ARX} is performed by grid search me
 \end{figure}
 
 
-Apart from the metrics above, we also generate the empirical distribution of absolute relative errors $|\frac{D_{st} - \hat{D_{st}}}{D_{st}}|$ for the \emph{GP-AR}, \emph{GP-ARX}, \emph{NM} and \emph{TL} models. These empirical cumulative distributions enable us to upper bound the percentage error in $D_{st}$ prediction and attach probability estimates for said bounds.
+Apart from the metrics above, we also generate the empirical distribution of absolute relative errors $|\frac{Dst - \hat{Dst}}{Dst}|$ for the \emph{GP-AR}, \emph{GP-ARX}, \emph{NM} and \emph{TL} models. These empirical cumulative distributions enable us to upper bound the percentage error in $Dst$ prediction and attach probability estimates for said bounds.
 
 
 \subsection{Models Compared}
 
 Table \ref{table:DstModels} gives a brief enumeration of the models compared, we use the performance benchmark results published in \citet{Ji2012} and to them add results obtained from testing \emph{GP-AR}, \emph{GP-ARX} as well as the \emph{Persistence} model on the same list of storms. 
 
-For the purpose of generating the cumulative probability plots of the model errors, we must obtain hourly predictions for all the storm events using the \emph{NARMAX} and \emph{TL} models. In the case of the \emph{NM} model, the formula outlined in \citet{balikhin:narmax} is used to generate hourly predictions. For the \emph{TL} model we use real time predictions listed on their website (\url{http://lasp.colorado.edu/home/spaceweather/}) corresponding to all the storm events. The real time predictions are at a frequency of ten minutes, hourly predictions are generated by averaging the $D_{st}$ predictions for each hour.
+For the purpose of generating the cumulative probability plots of the model errors, we must obtain hourly predictions for all the storm events using the \emph{NARMAX} and \emph{TL} models. In the case of the \emph{NM} model, the formula outlined in \citet{balikhin:narmax} is used to generate hourly predictions. For the \emph{TL} model we use real time predictions listed on their website (\url{http://lasp.colorado.edu/home/spaceweather/}) corresponding to all the storm events. The real time predictions are at a frequency of ten minutes, hourly predictions are generated by averaging the $Dst$ predictions for each hour.
 
 \begin{table}
-      \caption[]{One Step Ahead $D_{st}$ prediction models compared in \citet{Ji2012}}
+      \caption[]{One Step Ahead $Dst$ prediction models compared in \citet{Ji2012}}
          \label{table:DstModels}
       
          \begin{tabular}{lll}
@@ -386,7 +382,7 @@ For the purpose of generating the cumulative probability plots of the model erro
             \noalign{\smallskip}
             TL & \citet{JGRA:JGRA16300} & Auto regressive model decomposable into additive terms.      \\
             NM & \citet{balikhin:narmax} & Non linear auto regressive with exogenous inputs. \\
-            B & \citet{JGR:JGR10260} & Prediction of $D_{st}$ by solving ODE having injection and decay terms. \\
+            B & \citet{JGR:JGR10260} & Prediction of $Dst$ by solving ODE having injection and decay terms. \\
             W & \citet{Wang:Dst} & Obtained by modification of injection term in \citet{JGR:JGR10260}. \\
             FL & \citet{GRL:GRL11549} & Uses polarity of magnetic clouds to predict geomagnetic response.\\
             OM & \citet{JGRA:JGRA14856} & Modification of injection term in \citet{JGR:JGR10260}.\\
@@ -421,7 +417,7 @@ With respect to the \emph{TL} model one important concern must be expressed. The
 
 Figures \ref{fig:rmse}, \ref{fig:cc}, \ref{fig:deltaDst} and \ref{fig:timingErr} compare the performance of \emph{GP-AR}, \emph{GP-ARX} and the \emph{Persistence} model with the existing results of \citet{Ji2012}. Figure \ref{fig:rmse} compares the average RMSE of the models over the list of 63 storms, we can see that the \emph{GP-ARX} model gives an improvement of approximately $38\%$ in RMSE with respect to the \emph{TL} model and $60\%$ improvement with respect to the \emph{NM} model. 
 
-Figure \ref{fig:relprob} compares the empirical distributions of absolute relative model errors across all storm events in the experiments. If one chooses a $95\%$ probability bound then it can be seen that the \emph{GP-ARX} model bounds the relative error to $20\%$ of the actual $D_{st}$ value, while in the case of the \emph{NM} model it bounds the relative error to $50\%$ of the actual $D_{st}$ value. Therefore the \emph{GP-ARX} model gives an approximate improvement of $25\%$ over the other compared models on the test data set chosen.
+Figure \ref{fig:relprob} compares the empirical distributions of absolute relative model errors across all storm events in the experiments. If one chooses a $95\%$ probability bound then it can be seen that the \emph{GP-ARX} model bounds the relative error to $20\%$ of the actual $Dst$ value, while in the case of the \emph{NM} model it bounds the relative error to $50\%$ of the actual $Dst$ value. Therefore the \emph{GP-ARX} model gives an approximate improvement of $25\%$ over the other compared models on the test data set chosen.
 
 
 \begin{figure}
@@ -434,7 +430,7 @@ Figure \ref{fig:relprob} compares the empirical distributions of absolute relati
 
 
 
-Figure \ref{fig:cc} shows the comparison of correlation coefficients between model predictions and actual $D_{st}$ values. From the results of \citet{Ji2012}, the \emph{TL} model gives the highest correlation coefficient of $94\%$, but that is not surprising considering the fact that there is a large overlap between the training data used to train it and storm events. This is also the case in \ref{fig:relprob} where we average predictions generated from a pre-trained instance of the \emph{TL} model. Even so the \emph{GP-ARX} model gives comparable correlation coefficient to \emph{TL} a testimony to its performance given that its training set has no overlap with the storm events.
+Figure \ref{fig:cc} shows the comparison of correlation coefficients between model predictions and actual $Dst$ values. From the results of \citet{Ji2012}, the \emph{TL} model gives the highest correlation coefficient of $94\%$, but that is not surprising considering the fact that there is a large overlap between the training data used to train it and storm events. This is also the case in \ref{fig:relprob} where we average predictions generated from a pre-trained instance of the \emph{TL} model. Even so the \emph{GP-ARX} model gives comparable correlation coefficient to \emph{TL} a testimony to its performance given that its training set has no overlap with the storm events.
 
 \begin{figure}
    \centering
@@ -444,7 +440,7 @@ Figure \ref{fig:cc} shows the comparison of correlation coefficients between mod
 \end{figure}
 
 
-Figure \ref{fig:deltaDst} shows how the different models compare with respect to accuracy in predicting the peak value of $D_{st}$ during storm events ($\Delta Dst_{min}$ averaged over all storms). In the context of this metric the \emph{GP-ARX} model gives a $31\%$ improvement over the \emph{TL} model and $40\%$ over the \emph{NM} model. It is trivial to note that by definition, the \emph{Persistence} model ($\hat{D_{st}}(t) = D_{st}(t-1)$) will have $\Delta Dst_{min} = 0$ for every storm instance.
+Figure \ref{fig:deltaDst} shows how the different models compare with respect to accuracy in predicting the peak value of $Dst$ during storm events ($\Delta Dst_{min}$ averaged over all storms). In the context of this metric the \emph{GP-ARX} model gives a $31\%$ improvement over the \emph{TL} model and $40\%$ over the \emph{NM} model. It is trivial to note that by definition, the \emph{Persistence} model ($\hat{Dst}(t) = Dst(t-1)$) will have $\Delta Dst_{min} = 0$ for every storm instance.
 
 Figure \ref{fig:timingErr} compares the time discrepancy of predicting the storm peak, again as observed above the \emph{Persistence} model will always have $\Delta t_{peak} = -1$, the GP-AR and GP-ARX models give better performance than the other models in terms of timing error in prediction of storm peaks. 
 
@@ -463,8 +459,8 @@ As noted in section \ref{sec:inference}, \emph{Gaussian Process} models generate
 
 \begin{comment}
 \begin{enumerate}
-    \item Persistence Behavior: It is clear that the \emph{persistence} behavior in the $D_{st}$ values is very strong i.e. the trivial predictive model $\hat{D_{st}}(t) = D_{st}(t-1)$ gives excellent performance. In fact it can be seen in these figures that the \emph{Persistence} model is outperforms every model compared by \citet{Ji2012} in the context of OSA prediction of $D_{st}$. Therefore any model that is proposed to tackle the OSA prediction problem for $D_{st}$ must be compared to and show visible gains over the \emph{Persistence} model.
-    \item Assessment of Gaussian Process Models: The results indicate that there are many benefits to be gained by the application of Gaussian Process models for prediction of $D_{st}$. The \emph{GP-AR} and \emph{GP-ARX} not only outperform the models compared in \citet{Ji2012} but also the \emph{Persistence} model. 
+    \item Persistence Behavior: It is clear that the \emph{persistence} behavior in the $Dst$ values is very strong i.e. the trivial predictive model $\hat{Dst}(t) = Dst(t-1)$ gives excellent performance. In fact it can be seen in these figures that the \emph{Persistence} model is outperforms every model compared by \citet{Ji2012} in the context of OSA prediction of $Dst$. Therefore any model that is proposed to tackle the OSA prediction problem for $Dst$ must be compared to and show visible gains over the \emph{Persistence} model.
+    \item Assessment of Gaussian Process Models: The results indicate that there are many benefits to be gained by the application of Gaussian Process models for prediction of $Dst$. The \emph{GP-AR} and \emph{GP-ARX} not only outperform the models compared in \citet{Ji2012} but also the \emph{Persistence} model. 
 \end{enumerate}
 \end{comment}
   
@@ -472,7 +468,7 @@ As noted in section \ref{sec:inference}, \emph{Gaussian Process} models generate
 
 We conclude this paper with three key conclusions/insights learned from our research so far.
    \begin{enumerate}
-      \item \emph{Persistence} model must be central in the model evaluation process in the context of \emph{One Step Ahead} prediction of the $D_{st}$ index. It is clear that the \emph{persistence} behavior in the $D_{st}$ values is very strong i.e. the trivial predictive model $\hat{D_{st}}(t) = D_{st}(t-1)$ gives excellent performance. In fact it can be seen in \ref{sec:res} that the \emph{Persistence} model is outperforms every model compared by \citet{Ji2012} in the context of OSA prediction of $D_{st}$. Therefore any model that is proposed to tackle the OSA prediction problem for $D_{st}$ must be compared to the \emph{Persistence} model and show visible gains above it.
+      \item \emph{Persistence} model must be central in the model evaluation process in the context of \emph{One Step Ahead} prediction of the $Dst$ index. It is clear that the \emph{persistence} behavior in the $Dst$ values is very strong i.e. the trivial predictive model $\hat{Dst}(t) = Dst(t-1)$ gives excellent performance. In fact it can be seen in \ref{sec:res} that the \emph{Persistence} model is outperforms every model compared by \citet{Ji2012} in the context of OSA prediction of $Dst$. Therefore any model that is proposed to tackle the OSA prediction problem for $Dst$ must be compared to the \emph{Persistence} model and show visible gains above it.
       
       \item \emph{Gaussian Process} AR and ARX models give encouraging benefits in OSA prediction even when compared to the \emph{Persistence} model. Leveraging the strengths of the Bayesian approach, they are able to learn robust predictors from data. 
       
