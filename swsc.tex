@@ -290,6 +290,14 @@ The simplest auto-regressive models for \emph{OSA} prediction of $Dst$ are those
 
 \subsection{Gaussian Process Auto-Regressive with eXogenous inputs (GP-ARX)} \label{sec:gparx}
 
+\begin{figure}
+   \centering
+   \includegraphics[width=\textwidth]{energyLandscape.png}
+      \caption{Contour plot of model selection metric (\emph{RMSE}) for \emph{GP-ARX} over the validation data.}
+         \label{fig:energy}
+   \end{figure}
+
+
 Auto-regressive models can be improved by including exogenous quantities that can help in improving predictions. It is well known that the solar wind and interplanetary magnetic field are important factors that influence the Earth's geomagnetic state (\citet{JGRA:JGRA11775}, \citet{Russell1974}).
 
 Hourly solar wind velocity $V(t)$ and interplanetary magnetic field $B_z(t)$ recorded by the ACE satellite are used as the exogenous inputs of the model, along with the time history of $Dst$. In this model we choose distinct time lags $p$ and $p_{ex}$ for auto-regressive and exogenous variables respectively. In addition we explicitly include the product $V B_z$ which is a proxy for the electric field, as an input.
@@ -372,7 +380,7 @@ For the purpose of generating the cumulative probability plots of the model erro
 \end{figure}
 
 
-With respect to the \emph{TL} model one important caveat must be noted. The training of the \emph{TL} model was done on Omni data from 1996-2002 which overlaps with a large number of the storm events, therefore the experimental procedure has a strong bias towards \emph{TL} model.
+With respect to the \emph{TL} model one important caveat must be noted. The training of the \emph{TL} model was performed on the OMNI data from 1996-2002 which overlaps with a large number of the storm events, therefore the experimental procedure has a strong bias towards \emph{TL} model.
 
 \section{Results} \label{sec:res}
 %%  This two-panel figure was inserted by JFW to demonstrate the subfigure and epstopdf packages
