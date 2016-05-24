@@ -91,6 +91,8 @@
    \author{M. Chandorkar
           \inst{1}
           \and
+          S. Wing \inst{1}
+          \and
           E. Camporeale\inst{1}
           }
 
@@ -313,7 +315,10 @@ Hourly solar wind velocity $V(t)$ and interplanetary magnetic field $B_z(t)$ rec
 
 Before running performance bench marks for \emph{OSA} $Dst$ prediction on the storm events in \cite{Ji2012}, training and model selection of \emph{GP-AR} and \emph{GP-ARX} models on independent data sets must be performed. For this purpose we choose segments 00:00 1 January 2008 - 10:00 11 January 2008 for training and 00:00 15 November 2014 - 23:00 1 December 2014 for model selection.
 
-Model selection of \emph{GP-AR} and \emph{GP-ARX} is performed by grid search methodology and the root mean square error (\emph{RMSE}) on the validation set is used to select the values of the model hyper-parameters. The time lags chosen for \emph{GP-AR} are $p = 6$ while for \emph{GP-ARX} $p=6$, $p_{ex} = 1$ are arrived by experimenting with values starting from one and choosing the value of $p$ yielding best performance on the 63 events in the bench mark.   
+Model selection of \emph{GP-AR} and \emph{GP-ARX} is performed by grid search methodology and the root mean square error (\emph{RMSE}) on the validation set is used to select the values of the model hyper-parameters. Figure \ref{fig:energy} shows a contour plot of the \emph{RMSE} computed on the validation data for the \emph{GP-ARX} model, the x axis represents the intercept $b$ of the polynomial kernel while the y axis represents $\sigma$ the standard deviation of the noise of the GP model as seen in section \ref{sec:inference}. In the experiments performed the best performing values of the hyper-parameters outputted by the grid search routing are $b = 0.002,\ \sigma = 1.994$. 
+
+
+The time lags chosen for \emph{GP-AR} are $p = 6$ while for \emph{GP-ARX} $p=6$, $p_{ex} = 1$ are arrived by experimenting with values starting from one and choosing the value of $p$ yielding best performance on the 63 events in the bench mark.   
 
 \begin{figure}
    \centering
