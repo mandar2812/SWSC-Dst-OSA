@@ -91,15 +91,17 @@
    \author{M. Chandorkar
           \inst{1}
           \and
-          S. Wing \inst{1}
-          \and
           E. Camporeale\inst{1}
+          \and 
+          S. Wing \inst{1}
           }
 
    \institute{Centrum Wiskunde Informatica (CWI), Amsterdam,
               1098XG Amsterdam\\
               \email{\href{mailto:m.h.chandorkar@cwi.nl}{m.h.chandorkar@cwi.nl} \href{mailto:e.camporeale@cwi.nl}{e.camporeale@cwi.nl}} 
              }
+               
+   %\institute{Johns Hopkins University, Applied Physics Laboratory, \\ 11100 Johns Hopkins Road, Laurel, Maryland 20723}
 
 %%   \date{Received September 15, 1996; accepted March 16, 1997}
 
@@ -133,20 +135,20 @@
 
 The magnetosphere's dynamics and its associated solar wind driver form a complex dynamical system. It is therefore instructive and greatly simplifying to use representative indices to quantify the state of geomagnetic activity.
 
-Geomagnetic indices come in various forms, they may take continuous or discrete values, indices may be calculated at varying time frequencies. Their values are often calculated by averaging or combining a number of readings taken by instruments around the Earth. Each geomagnetic index is a proxy for a particular kind of phenomena. Some popular indices are the $K_p$, $Dst$ and the $AE$ index.
+Geomagnetic indices come in various forms, they may take continuous or discrete values, indices may be calculated at varying time resolutions. Their values are often calculated by averaging or combining a number of readings taken by instruments around the Earth. Each geomagnetic index is a proxy for a particular kind of phenomena. Some popular indices are the $K_p$, $Dst$ and the $AE$ index.
 
 \begin{enumerate}
-    \item $K_p$: The Kp-index is a discrete valued global geomagnetic storm index and is based on 3 hour measurements of the K-indices, for a given value, for each of the past days. The K-index itself is a three hour long quasi-logarithmic local index of the geomagnetic activity, relative to a calm day curve for the given location.
+    \item $K_p$: The Kp-index is a discrete valued global geomagnetic storm index and is based on 3 hour measurements of the K-indices \cite{Bartels}. The K-index itself is a three hour long quasi-logarithmic local index of the geomagnetic activity, relative to a calm day curve for the given location.
     
-    \item $AE$: The Auroral Electrojet Index, $AE$, is designed to provide a global, quantitative measure of auroral zone magnetic activity produced by enhanced Ionospheric currents flowing below and within the auroral oval. It is a continuous index which is calculated every hour.
+    \item $AE$: The Auroral Electrojet Index, $AE$, is designed to provide a global, quantitative measure of auroral zone magnetic activity produced by enhanced Ionospheric currents flowing below and within the auroral oval \cite{AEIndex}. It is a continuous index which is calculated every hour.
     
-    \item $Dst$: A continuous hourly index which measures the weakening of the Earths magnetic field due to ring currents. 
+    \item $Dst$: A continuous hourly index which measures the weakening of the Earths magnetic field due to ring currents and the strength of geomagnetic storms \cite{DesslerAndParker}. 
 \end{enumerate}
 
 %Talk about Burton and friends
-We focus on prediction of the hourly $Dst$ index which is a straightforward indicator of geomagnetic storms. More specifically, we focus on the \emph{one step ahead} (OSA) prediction of $Dst$ because it is the first piece towards building long term predictions of geomagnetic response of the Earth to changing space weather conditions. 
+For the present study, we focus on prediction of the hourly $Dst$ index which is a straightforward indicator of geomagnetic storms. More specifically, we focus on the \emph{one step ahead} (OSA), in this case one hour ahead prediction of $Dst$ because it is the first piece towards building long term predictions of geomagnetic response of the Earth to changing space weather conditions. 
 
-The $Dst$ OSA prediction problem has been the subject of several modeling efforts in the literature. One the earliest models has been presented by \citet{JGR:JGR10260} who calculated $Dst(t)$ as the solution of an \emph{Ordinary Differential Equation} (ODE) which expressed the rate of change of $Dst(t)$ as a combination of two terms: decay and injection $\frac{d Dst(t)}{dt} = Q(t) - \frac{Dst(t)}{\tau}$. 
+The $Dst$ OSA prediction problem has been the subject of several modeling efforts in the literature. One the earliest models has been presented by \citet{JGR:JGR10260} who calculated $Dst(t)$ as the solution of an \emph{Ordinary Differential Equation} (ODE) which expressed the rate of change of $Dst(t)$ as a combination of two terms: decay and injection $\frac{d Dst(t)}{dt} = Q(t) - \frac{Dst(t)}{\tau}$, where Q(t) relates to the particle injection from the plasma sheet into the inner magnetosphere. 
 
 The \citet{JGR:JGR10260} model has proven to be very influential particularly due to its simplicity. Many subsequent works have modified the proposed ODE by proposing alternative expressions for the injection term $Q(t)$ [see \citet{Wang:Dst}, \citet{JGRA:JGRA14856}]. More recently \citet{Ballatore2014} have tried to generate empirical estimates for the injection and decay terms in Burton's equation.
 
@@ -154,13 +156,13 @@ The \citet{JGR:JGR10260} model has proven to be very influential particularly du
 Another important empirical model used to predict $Dst$ is the \emph{Nonlinear Auto-Regessive Moving Average with eXogenous inputs} (NARMAX) methodology developed in \citet{doi:10.1080/00207178908559767}, \citet{GRL:GRL13494}, \citet{GRL:GRL20944}, \citet{JGRA:JGRA18657}, \citet{balikhin:narmax}, \citet{JGRA:JGRA20661} and \citet{JGRA:JGRA50192}. The NARMAX methodology builds models by constructing polynomial expansions of inputs and determines the best combinations of monomials to include in the refined model by using a criterion called the \emph{error reduction ratio} (ERR). The parameters of the so called NARMAX OLS-ERR model are calculated using the standard \emph{ordinary least squares} (OLS) method to minimize an objective function. The reader may refer to \citet{billings2013nonlinear} for a detailed exposition of the NARMAX methodology.
 
 %Talk about neural networks
-Yet another family of forecasting methods is based on \emph{Artificial Neural Networks} (ANN) that have been a popular choice for building predictive models. Researchers have employed both the standard \emph{feed forward} and the more specialized \emph{recurrent} architectures. \citet{Lund} proposed an \emph{Elman} recurrent network architecture called Lund $Dst$, which used the solar wind velocity, \emph{interplanetary magnetic field} (IMF) and historical $Dst$ data as inputs. \citet{SWE:SWE286} originally proposed a \emph{feed forward} network for predicting the $K_p$ index which used the \emph{Boyle coupling function} [see \citet{boyle1997empirical}]. The same architecture is adapted for prediction of $Dst$ in \citet{SWE:SWE286}, which is popularly known as the Rice $Dst$ model. \citet{pallocchia:hal-00318011} proposed a \emph{neural network} model called EDDA to predict $Dst$ using only the IMF data.
+Yet another family of forecasting methods is based on \emph{Artificial Neural Networks} (ANN) that have been a popular choice for building predictive models. Researchers have employed both the standard \emph{feed forward} and the more specialized \emph{recurrent} architectures. \citet{Lund} proposed an \emph{Elman} recurrent network architecture called Lund $Dst$, which used the solar wind velocity, \emph{interplanetary magnetic field} (IMF) and historical $Dst$ data as inputs. \citet{JGRA:JGRA17461} used the recurrent neural networks to predict $Kp$. \citet{SWE:SWE286} originally proposed a \emph{feed forward} network for predicting the $K_p$ index which used the \emph{Boyle coupling function} [see \citet{boyle1997empirical}]. The same architecture is adapted for prediction of $Dst$ in \citet{SWE:SWE286}, which is popularly known as the Rice $Dst$ model. \citet{pallocchia:hal-00318011} proposed a \emph{neural network} model called EDDA to predict $Dst$ using only the IMF data.
 
 %Talk about comparison papers, number of storms covered and Persistence
 In light of the extensive list of modeling techniques employed for prediction of the $Dst$ index, model comparison and evaluation becomes a crucial direction in advancing the research domain. \citet{Rastatter2013} compare several physics based (convection, kinetic and magneto hydrodynamic) and empirical prediction models such as NARMAX, Rice $Dst$ on 4 storm events which occurred between 2001 and 2006. \citet{Amata2008} compare the EDDA and the Lund $Dst$ models over the 2003-2005 period. The most extensive model comparison in terms of storm events was probably conducted in \citet{Ji2012} which compared six $Dst$ models (see table \ref{table:DstModels}) on a list of 63 geomagnetic storm events of varying intensities which occurred between 1998 and 2006. In the comparison done in \citet{Ji2012}, the model proposed in \citet{JGRA:JGRA16300} gives the best performance on the test set considered.  
 
 %Vision
-In $Dst$ prediction a seemingly trivial yet highly informative prediction method is represented by the so called \emph{Persistence} model this is simply using the previous value of $Dst$ as the prediction for the next time step ($\hat{D}st(t) = Dst(t-1)$). Due to high correlation between $Dst$ values one hour apart ($Dst(t)$, $Dst(t-1)$), despite its apparent lack of sophistication the \emph{Persistence} model gives excellent predictive performance on error metrics. In essence it is a trivial hypothesis and hence it should always be used as a base line to compare the performance of any proposed $Dst$ algorithm. Moreover, given its zero computational cost, a model should at least outperform the \emph{Persistence} model in order to be a viable candidate for advancing the science of space weather prediction.
+In $Dst$ prediction, a seemingly trivial yet highly informative prediction method is represented by the so called \emph{Persistence} model, which uses the previous value of $Dst$ as the prediction for the next time step ($\hat{D}st(t) = Dst(t-1)$). Due to high correlation between $Dst$ values one hour apart ($Dst(t)$, $Dst(t-1)$), despite its apparent lack of sophistication the \emph{Persistence} model gives excellent predictive performance on error metrics. In essence it is a trivial hypothesis and hence it should always be used as a base line to compare the performance of any proposed $Dst$ algorithm. Moreover, given its zero computational cost, a model should at least outperform the \emph{Persistence} model in order to be a viable candidate for advancing the science of space weather prediction.
 
 %Assertion
 In this paper, we propose \emph{Gaussian Process} models for OSA prediction of $Dst$. We use the results of \citet{Ji2012} as a starting point and compare our proposed models with the methods outlined in the same paper while using the performance of the \emph{Persistence} model as a base line. 
@@ -193,7 +195,7 @@ Out task is to infer the the values of the unknown function $f(.)$ based on the 
  p( \mathbf{f} \ | \ \mathbf{x}_1, \cdots, \mathbf{x}_N) & = & \frac{1}{(2\pi)^{n/2} det(\mathbf{\Lambda})^{1/2}} exp \left(-\frac{1}{2} (\mathbf{f} - \mathbf{\mu})^T \mathbf{\Lambda}^{-1} (\mathbf{f} - \mathbf{\mu}) \right) \label{eq:sto}
 \end{eqnarray}
 
-Here $\matbf{f}$ is an $N\times 1$ vector consisting of the values $f(\mathbf{x}_i), i = q \cdots N$. In equation \ref{eq:normal} $\mathbf{f}|\mathbf{x}_1, \cdots, \mathbf{x}_N$ denotes the conditional distribution of $\mathbf{f}$ with respect to the input data (i.e. $\mathbf{X}$) and $\mathcal{N}\left( \mathbf{\mu}, \mathbf{\Lambda} \right)$ represents a multivariate Gaussian distribution with mean vector $\mathbf{\mu}$ and covariance matrix $\mathbf{\Lambda}$. The probability density function of this distribution $p( \mathbf{f} \ | \ \mathbf{x}_1, \cdots, \mathbf{x}_N)$ is therefore given by equation \ref{eq:sto}.
+Here $\mathbf{f}$ is an $N\times 1$ vector consisting of the values $f(\mathbf{x}_i), i = q \cdots N$. In equation \ref{eq:normal} $\mathbf{f}|\mathbf{x}_1, \cdots, \mathbf{x}_N$ denotes the conditional distribution of $\mathbf{f}$ with respect to the input data (i.e. $\mathbf{X}$) and $\mathcal{N}\left( \mathbf{\mu}, \mathbf{\Lambda} \right)$ represents a multivariate Gaussian distribution with mean vector $\mathbf{\mu}$ and covariance matrix $\mathbf{\Lambda}$. The probability density function of this distribution $p( \mathbf{f} \ | \ \mathbf{x}_1, \cdots, \mathbf{x}_N)$ is therefore given by equation \ref{eq:sto}.
 
 From equation \ref{eq:sto}, one can observe that in order to uniquely define the distribution of the process, it is required to specify $\mathbf{\mu}$ and $\mathbf{\Lambda}$. For this probability density to be valid, there is a further requirements imposed on $\mathbf{\Lambda}$: 
 
@@ -300,7 +302,7 @@ The simplest auto-regressive models for \emph{OSA} prediction of $Dst$ are those
    \end{figure}
 
 
-Auto-regressive models can be improved by including exogenous quantities that can help in improving predictions. It is well known that the solar wind and interplanetary magnetic field are important factors that influence the Earth's geomagnetic state (\citet{JGRA:JGRA11775}, \citet{Russell1974}).
+Auto-regressive models can be improved by including exogenous quantities that can help in improving predictions. It is well known that the solar wind and interplanetary magnetic field are important factors that influence the Earth's geomagnetic state (\citet{JGRA:JGRA11775}, \citet{Russell1974}, \citet{JGRA:JGRA17574}).
 
 Hourly solar wind velocity $V(t)$ and interplanetary magnetic field $B_z(t)$ recorded by the ACE satellite are used as the exogenous inputs of the model, along with the time history of $Dst$. In this model we choose distinct time lags $p$ and $p_{ex}$ for auto-regressive and exogenous variables respectively. In addition we explicitly include the product $V B_z$ which is a proxy for the electric field, as an input.
     
