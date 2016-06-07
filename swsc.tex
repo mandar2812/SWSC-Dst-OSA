@@ -93,7 +93,7 @@
           \and
           E. Camporeale\inst{1}
           \and 
-          S. Wing \inst{2}
+          S. Wing \inst{1,2}
           }
 
    \institute{\inst{1} Centrum Wiskunde Informatica (CWI), Amsterdam,
@@ -304,7 +304,9 @@ The simplest auto-regressive models for \emph{OSA} prediction of $Dst$ are those
    \end{figure}
 
 
-Auto-regressive models can be improved by including exogenous quantities that can help in improving predictions. It is well known that the solar wind and interplanetary magnetic field are important factors that influence the Earth's geomagnetic state (\citet{JGRA:JGRA11775}, \citet{Russell1974}, \citet{JGRA:JGRA17574}).
+Auto-regressive models can be improved by including exogenous quantities that can help in improving predictions. $Dst$ gives a measure of ring currents, which are modulated by plasma sheet particle injections into the inner magnetosphere during sub-storms. Studies have shown that the substorm occurrence rate increases with solar wind velocity (high speed streams) (\citet{Kissinger2011}, \citet{Newell2016}). Prolonged southward interplanetary magnetic field (IMF) z-component ($B_z$) is needed for sub-storm to occur (\citet{McPherron1986}). An increase in the solar wind electric field, $VB_z$, can increase the dawn-dusk electric field in the magnetotail, which in turn determines the amount of plasma sheet particle that move to the inner magnetosphere (\citet{Friedel2001}). Therefore, our exogenous parameters consist of solar wind velocity, IMF $B_z$, and $VB_z$.   
+
+%It is well known that the solar wind and interplanetary magnetic field are important factors that influence the Earth's geomagnetic state (\citet{JGRA:JGRA11775}, \citet{Russell1974}, \citet{JGRA:JGRA17574}).
 
 Hourly solar wind velocity $V(t)$ and interplanetary magnetic field $B_z(t)$ recorded by the ACE satellite are used as the exogenous inputs of the model, along with the time history of $Dst$. In this model we choose distinct time lags $p$ and $p_{ex}$ for auto-regressive and exogenous variables respectively. In addition we explicitly include the product $V B_z$ which is a proxy for the electric field, as an input.
     
@@ -487,50 +489,6 @@ Multi-step ahead prediction should be the preferred gold standard with respect t
 %%    three lines above (insert % at the start of each line) 
 
 \begin{thebibliography}{}
-
-   \bibitem[Baker(1966)]{baker} Baker, N., Solar Evolution,
-      in Stellar Evolution, ed.\ R. F. Stein and A. G. W. Cameron,
-      Plenum, New York, 333, 1966.
-
-   \bibitem[Balluch(1988)]{balluch} Balluch, M., A paper on something, 
-      {\it Astron. Astrophys}, {\bf 200}, 58-63, 1988.
-
-   \bibitem[Cox(1980)]{cox} Cox, J. P.,
-      Theory of Stellar Pulsation,
-      Princeton University Press, Princeton, 1980.
-
-   \bibitem[Cox and Stewart(1969)]{cox69} Cox, A. N., and J. N. Stewart,
-      Academia Nauk, {\it Scientific Information}, {\bf 15}, 1-11, 1969.
-
-   \bibitem[Dumm and Kopf(2014)]{dummkopf} Dumm, Z., and Z. Kopf, A new self-inconsistent 
-      core stability model, 
-      {\it J. Space Weather Space Clim.}, {\bf 4}, A00, 2014, DOI: 10.1051/swsc/2014000,
-      \url{http://dx.doi.org/10.1051/swsc/2014000}.
-
-   \bibitem[Fool(2012)]{fool} Fool, X. Y., All earlier results are wrong, 
-      {\it J. Space Weather Space Clim.}, {\bf 2}, A00, 2012, DOI: 10.1051/swsc/2012000,
-      \url{http://dx.doi.org/10.1051/swsc/2012000}.
-
-   \bibitem[Fou(2013)]{fou} Fou, Y. X., No earlier results were right, 
-      {\it J. Space Weather Space Clim.}, {\bf 3}, A00, 2013, DOI: 10.1051/swsc/2013000,
-      \url{http://dx.doi.org/10.1051/swsc/2013000}.
-
-   \bibitem[Kr\"ugel et al.(1971)]{krugel71} Kr\"ugel, A. H., A. F. Davidsen, D. Tytler, and G. A. Kriss, 
-      Summary of Project Achievements, Technical Report 08-11, 
-      Fake Company, Nowherecity, Nowhereland, 1971.
-
-   \bibitem[Mizuno(1980)]{mizuno} Mizuno, H., A further step backward in scientific understanding, 
-      {\it Prog. Theor. Phys.}, {\bf 64}, 544-545, 1980.
-   
-   \bibitem[Tscharnuter(1987)]{tscharnuter} Tscharnuter, W. M., Who knows about astronomy?, 
-      {\it Astron. Astrophys}, {\bf 188}, 55-57, 1987.
-
-   \bibitem[Yorke(1980a)]{yorke80a} Yorke, H. W., A paper on nothing, 
-      {\it Astron. Astrophys}, {\bf 86}, 286, 1980a.
-
-   \bibitem[Yorke(1980b)]{yorke80b} Yorke, H. W., A paper on everything, 
-      {\it Astron. Astrophys}, {\bf 86}, 291, 1980b.
-
 \end{thebibliography}
 
 \end{linenumbers}
