@@ -161,7 +161,7 @@ Another important empirical model used to predict $Dst$ is the \emph{Nonlinear A
 Yet another family of forecasting methods is based on \emph{Artificial Neural Networks} (ANN) that have been a popular choice for building predictive models. Researchers have employed both the standard \emph{feed forward} and the more specialized \emph{recurrent} architectures. \citet{Lund} proposed an \emph{Elman} recurrent network architecture called Lund $Dst$, which used the solar wind velocity, \emph{interplanetary magnetic field} (IMF) and historical $Dst$ data as inputs. \citet{JGRA:JGRA17461} used the recurrent neural networks to predict $Kp$. \citet{SWE:SWE286} originally proposed a \emph{feed forward} network for predicting the $K_p$ index which used the \emph{Boyle coupling function} [see \citet{boyle1997empirical}]. The same architecture is adapted for prediction of $Dst$ in \citet{SWE:SWE286}, which is popularly known as the Rice $Dst$ model. \citet{pallocchia:hal-00318011} proposed a \emph{neural network} model called EDDA to predict $Dst$ using only the IMF data.
 
 %Talk about comparison papers, number of storms covered and Persistence
-In light of the extensive list of modeling techniques employed for prediction of the $Dst$ index, model comparison and evaluation becomes a crucial direction in advancing the research domain. \citet{Rastatter2013} compare several physics based (convection, kinetic and magneto hydrodynamic) and empirical prediction models such as NARMAX, Rice $Dst$ on 4 storm events which occurred between 2001 and 2006. \citet{Amata2008} compare the EDDA and the Lund $Dst$ models over the 2003-2005 period. The most extensive model comparison in terms of storm events was probably conducted in \citet{Ji2012} which compared six $Dst$ models (see table \ref{table:DstModels}) on a list of 63 geomagnetic storm events of varying intensities which occurred between 1998 and 2006. In the comparison done in \citet{Ji2012}, the model proposed in \citet{JGRA:JGRA16300} gives the best performance on the test set considered.  
+In light of the extensive list of modeling techniques employed for prediction of the $Dst$ index, model comparison and evaluation becomes a crucial direction in advancing the research domain. \citet{Rastatter2013} compare several physics based (convection, kinetic and magneto hydrodynamic) and empirical prediction models such as NARMAX, Rice $Dst$ on 4 storm events which occurred between 2001 and 2006. \citet{Amata2008} compare the EDDA and the Lund $Dst$ models over the 2003-2005 period. The most extensive model comparison in terms of storm events was probably conducted in \citet{Ji2012} which compared six $Dst$ models (see table \ref{table:DstModels}) on a list of 63 geomagnetic storm events of varying intensities which occurred between 1998 and 2006. In the comparison done in \citet{Ji2012}, the model proposed in \citet{JGRA:JGRA16300} gives the best performance on the test set considered. 
 
 %Vision
 In $Dst$ prediction, a seemingly trivial yet highly informative prediction method is represented by the so called \emph{Persistence} model, which uses the previous value of $Dst$ as the prediction for the next time step ($\hat{D}st(t) = Dst(t-1)$). Due to high correlation between $Dst$ values one hour apart ($Dst(t)$, $Dst(t-1)$), despite its apparent lack of sophistication the \emph{Persistence} model gives excellent predictive performance on error metrics. In essence it is a trivial hypothesis and hence it should always be used as a base line to compare the performance of any proposed $Dst$ algorithm. Moreover, given its zero computational cost, a model should at least outperform the \emph{Persistence} model in order to be a viable candidate for advancing the science of space weather prediction.
@@ -258,18 +258,15 @@ The central design issue in applying \emph{Gaussian Process} models is choice of
 
 For the success of a Gaussian Process model an appropriate choice of kernel function is paramount. The symmetry and positive semi-definiteness of \emph{Gaussian Process} kernels implies that they represent inner-products between some basis function representation of the data. The interested reader is suggested to refer to \cite{Berlinet2004}, \citet{Scholkopf:2001:LKS:559923} and \citet{hofmann2008} for a thorough treatment on kernel functions and the rich theory behind them. Some common kernel functions used in machine learning include the radial basis function (RBF) kernel $K(\mathbf{x}, \mathbf{y}) = \frac{1}{2} exp(-||\mathbf{x} - \mathbf{y}||^2/l^2)$ and the polynomial kernel $K(\mathbf{x}, \mathbf{y}) = (\mathbf{x}^\intercal \mathbf{y} + b)^d$. 
 
-The quantities $l$ in the RBF, $b$ and $d$ in the polynomial kernel are known as \emph{hyper-parameters}. Hyper-parameters give flexibility to particular kernel structure, for example $d = 1, 2, 3, \cdots$ in the polynomial kernel represents linear, quadratic, cubic and higher order polynomials respectively. The method of assigning values to the \emph{hyper-parameter} is crucial in the model building process (see section \ref{sec:hyp} below). In this study, we construct Gaussian Process regression models with linear polynomial kernels for \emph{one step ahead} prediction of the $Dst$ index. 
+The quantities $l$ in the RBF, $b$ and $d$ in the polynomial kernel are known as \emph{hyper-parameters}. Hyper-parameters give flexibility to particular kernel structure, for example $d = 1, 2, 3, \cdots$ in the polynomial kernel represents linear, quadratic, cubic and higher order polynomials respectively. The method of assigning values to the \emph{hyper-parameter} is crucial in the model building process. 
 
-\subsection{Optimizing Hyper-parameters} \label{sec:hyp}
+In this study, we construct Gaussian Process regression models with linear kernels as shown in equation \ref{eq:usedKernel}, for \emph{one step ahead} prediction of the $Dst$ index. Our choice of kernel leaves us with only one adjustable hyper-parameter, the model noise $\sigma$. 
 
-When applying \emph{Gaussian Process} models to data, one must choose appropriate values to the kernel hyper-parameters and noise level ($\sigma^2$). This is known as the problem of \emph{model selection}.
+\begin{equation}\label{eq:usedKernel}
+    K(\mathbf{x}, \mathbf{y}) = \mathbf{x}^\intercal \mathbf{y}
+\end{equation}
 
-Common examples of criteria used for \emph{model selection} include data likelihood, cross validation performance scores and validation set performance scores among others. Since model selection criteria are non-convex and non-smooth in general, gradient free approaches are used to find approximate values of local optima.
-
-The simplest way to perform \emph{model selection} is called \emph{grid search} which entails evaluating the above criteria on a fixed grid which is constructed by the tensorial product of grids constructed on each hyper-parameter. There are more sophisticated methods for \emph{model tuning} such as \emph{coupled simulated annealing} (\citet{Xavier-De-Souza2010}) and \emph{simplex search} (\citet{Nelder1965}) but they are computationally more expensive. 
-
-In this study we employ \emph{grid search} to find the best performing set of hyper-parameter assignments inside a predefined grid of possible hyper-parameter values.
-
+We initialize a grid of values for $\sigma$ the model noise and use the error on a predefined validation data set to choose the best performing value of $\sigma$. While constructing the grid of possible values for $\sigma$ it must be ensured that $\sigma > 0$ so that the kernel matrix constructed on the training data is non-singular.
 
 \section{One Step Ahead Prediction} \label{sec:osa}
 
@@ -296,14 +293,6 @@ The simplest auto-regressive models for \emph{OSA} prediction of $Dst$ are those
 
 \subsection{Gaussian Process Auto-Regressive with eXogenous inputs (GP-ARX)} \label{sec:gparx}
 
-\begin{figure}
-   \centering
-   \includegraphics[width=\textwidth]{energyLandscape.png}
-      \caption{Contour plot of model selection metric (\emph{RMSE}) for \emph{GP-ARX} over the validation data.}
-         \label{fig:energy}
-   \end{figure}
-
-
 Auto-regressive models can be improved by including exogenous quantities that can help in improving predictions. $Dst$ gives a measure of ring currents, which are modulated by plasma sheet particle injections into the inner magnetosphere during sub-storms. Studies have shown that the substorm occurrence rate increases with solar wind velocity (high speed streams) (\citet{Kissinger2011}, \citet{Newell2016}). Prolonged southward interplanetary magnetic field (IMF) z-component ($B_z$) is needed for sub-storm to occur (\citet{McPherron1986}). An increase in the solar wind electric field, $VB_z$, can increase the dawn-dusk electric field in the magnetotail, which in turn determines the amount of plasma sheet particle that move to the inner magnetosphere (\citet{Friedel2001}). Therefore, our exogenous parameters consist of solar wind velocity, IMF $B_z$, and $VB_z$.   
 
 %It is well known that the solar wind and interplanetary magnetic field are important factors that influence the Earth's geomagnetic state (\citet{JGRA:JGRA11775}, \citet{Russell1974}, \citet{JGRA:JGRA17574}).
@@ -321,8 +310,7 @@ Hourly solar wind velocity $V(t)$ and interplanetary magnetic field $B_z(t)$ rec
 
 Before running performance bench marks for \emph{OSA} $Dst$ prediction on the storm events in \cite{Ji2012}, training and model selection of \emph{GP-AR} and \emph{GP-ARX} models on independent data sets must be performed. For this purpose we choose segments 00:00 1 January 2008 - 10:00 11 January 2008 for training and 00:00 15 November 2014 - 23:00 1 December 2014 for model selection.
 
-Model selection of \emph{GP-AR} and \emph{GP-ARX} is performed by grid search methodology and the root mean square error (\emph{RMSE}) on the validation set is used to select the values of the model hyper-parameters. Figure \ref{fig:energy} shows a contour plot of the \emph{RMSE} computed on the validation data for the \emph{GP-ARX} model, the x axis represents the intercept $b$ of the polynomial kernel while the y axis represents $\sigma$ the standard deviation of the noise of the GP model as seen in section \ref{sec:inference}. In the experiments performed the best performing values of the hyper-parameters outputted by the grid search routing are $b = 0.002,\ \sigma = 1.994$. 
-
+Model selection of \emph{GP-AR} and \emph{GP-ARX} is performed by grid search methodology and the root mean square error (\emph{RMSE}) on the validation set is used to select the values of the model hyper-parameters. In the experiments performed the best performing values of the hyper-parameters outputted by the grid search routine are $\sigma = 0.45$ for the \emph{GP-ARX} and $\sigma = 1.173$ for \emph{GP-AR}. 
 
 The time lags chosen for \emph{GP-AR} are $p = 6$ while for \emph{GP-ARX} $p=6$, $p_{ex} = 1$ are arrived by experimenting with values starting from one and choosing the value of $p$ yielding best performance on the 63 events in the bench mark.   
 
@@ -452,13 +440,6 @@ As noted in section \ref{sec:inference}, \emph{Gaussian Process} models generate
 \end{enumerate}
 \end{comment}
 
-\begin{figure}
-   \centering
-   \includegraphics[width=\textwidth]{relerrorPeakARX.png}
-      \caption{Relationship between $\Delta Dst_{min}/|Dst_{min}|$ for the GP-ARX model on the \citet{Ji2012} test set.}
-         \label{fig:relativeErrors}
-\end{figure}
-  
 \section{Conclusions}
 
 In this paper, we proposed two \emph{Gaussian Process} auto-regressive models, \emph{GP-ARX} and \emph{GP-AR}, to generate hourly predictions of $Dst$. We compared the performance of our proposed models with the \emph{Persistence} model and six existing model benchmarks reported in \citet{Ji2012}. Predictive performance was compared on \emph{RMSE}, \emph{CC}, $\Delta Dst_{min}$ and $|\Delta t_{peak}|$ calculated on a list of 63 geomagnetic storms from \cite{Ji2012}.
