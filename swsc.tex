@@ -93,7 +93,7 @@
           \and
           E. Camporeale\inst{1}
           \and 
-          S. Wing \inst{1,2}
+          S. Wing \inst{2}
           }
 
    \institute{\inst{1} Centrum Wiskunde Informatica (CWI), Amsterdam,
@@ -114,13 +114,13 @@
    
    
    \abstract{
-    We present two models that improve the state of the art of \emph{One Step Ahead}(OSA) prediction of the $Dst$ geomagnetic activity index. In the domain of OSA prediction, it is well known that $Dst(t)$ values correlate strongly with values one hour in the past (i.e. $Dst(t-1)$). While a number of forecasting models have been proposed and compared, none of them have been compared with the \emph{Persistence} model to quantify their performance improvements above this most trivial of predictors. In this study we train Gaussian Process regression models for One Step Ahead (OSE) prediction of the Disturbance Storm Time ($Dst$) geomagnetic index. We propose two variants of the Gaussian Process model.
-    \begin{enumerate*}
-      \item Gaussian Process Auto regressive (GP-AR) 
-      \item Gaussian Process Auto regressive with eXogenous inputs (GP-ARX). 
-    \end{enumerate*}
+    We present two models, based on Gaussian Processes, for the \emph{One Step Ahead}(OSA) prediction of the $Dst$ geomagnetic activity index. 
+    The models are Auto regressive, with or without eXogenous inputs (GP-ARX and GP-AR, respectively).
     We compare the performance of these models with the current state of the art in one step ahead $Dst$ prediction on a set of 
-    63 benchmark storms from 1998-2006. The proposed Gaussian Process models not only outperform the rest but also the \emph{Persistence} model.
+    63 benchmark storms from 1998-2006, previously analyzed in an earlier study.
+    We show that, despite its lack of sophistication, the so-called Persistence model represents an important test to evaluate the performance of a one hour ahead $Dst$ model.
+    Contrary to the state-of-the-art models compared in the literature, our models consistently outperform the Persistence model and represent a substantial improvement in the field, when evaluated on standard metrics.
+    Finally, an important feature of the new models is that they naturally provide confidence intervals for their forecast.
     }
 
    \keywords{Geomagnetic indices --
@@ -137,40 +137,40 @@
 
 The magnetosphere's dynamics and its associated solar wind driver form a complex dynamical system. It is therefore instructive and greatly simplifying to use representative indices to quantify the state of geomagnetic activity.
 
-Geomagnetic indices come in various forms, they may take continuous or discrete values, indices may be calculated at varying time resolutions. Their values are often calculated by averaging or combining a number of readings taken by instruments around the Earth. Each geomagnetic index is a proxy for a particular kind of phenomena. Some popular indices are the $K_p$, $Dst$ and the $AE$ index.
+Geomagnetic indices come in various forms, they may take continuous or discrete values and may be defined with varying time resolutions. Their values are often calculated by averaging or combining a number of readings taken by instruments around the Earth. Each geomagnetic index is a proxy for a particular kind of phenomenon. Some popular indices are the $K_p$, $Dst$ and the $AE$ index.
 
 \begin{enumerate}
-    \item $K_p$: The Kp-index is a discrete valued global geomagnetic storm index and is based on 3 hour measurements of the K-indices \cite{Bartels}. The K-index itself is a three hour long quasi-logarithmic local index of the geomagnetic activity, relative to a calm day curve for the given location.
+    \item $K_p$: The Kp-index is a discrete valued global geomagnetic storm index and is based on 3 hour measurements of the K-indices \citep{Bartels}. The K-index itself is a three hour long quasi-logarithmic local index of the geomagnetic activity, relative to a calm day curve for the given location.
     
-    \item $AE$: The Auroral Electrojet Index, $AE$, is designed to provide a global, quantitative measure of auroral zone magnetic activity produced by enhanced Ionospheric currents flowing below and within the auroral oval \cite{AEIndex}. It is a continuous index which is calculated every hour.
+    \item $AE$: The Auroral Electrojet Index, $AE$, is designed to provide a global, quantitative measure of auroral zone magnetic activity produced by enhanced Ionospheric currents flowing below and within the auroral oval \citep{AEIndex}. It is a continuous index which is calculated every hour.
     
-    \item $Dst$: A continuous hourly index which measures the weakening of the Earths magnetic field due to ring currents and the strength of geomagnetic storms \cite{DesslerAndParker}. 
+    \item $Dst$: A continuous hourly index which measures the weakening of the Earths magnetic field due to ring currents and the strength of geomagnetic storms \citep{DesslerAndParker}. 
 \end{enumerate}
 
 %Talk about Burton and friends
-For the present study, we focus on prediction of the hourly $Dst$ index which is a straightforward indicator of geomagnetic storms. More specifically, we focus on the \emph{one step ahead} (OSA), in this case one hour ahead prediction of $Dst$ because it is the first piece towards building long term predictions of geomagnetic response of the Earth to changing space weather conditions. 
+For the present study, we focus on prediction of the hourly $Dst$ index which is a straightforward indicator of geomagnetic storms. More specifically, we focus on the \emph{one step ahead} (OSA), in this case one hour ahead prediction of $Dst$ because it is the simplest model towards building long term predictions of geomagnetic response of the Earth to changing space weather conditions. 
 
-The $Dst$ OSA prediction problem has been the subject of several modeling efforts in the literature. One the earliest models has been presented by \citet{JGR:JGR10260} who calculated $Dst(t)$ as the solution of an \emph{Ordinary Differential Equation} (ODE) which expressed the rate of change of $Dst(t)$ as a combination of two terms: decay and injection $\frac{d Dst(t)}{dt} = Q(t) - \frac{Dst(t)}{\tau}$, where Q(t) relates to the particle injection from the plasma sheet into the inner magnetosphere. 
+The $Dst$ OSA prediction problem has been the subject of several modeling efforts in the literature. One of the earliest models has been presented by \citet{JGR:JGR10260} who calculated $Dst(t)$ as the solution of an \emph{Ordinary Differential Equation} (ODE) which expressed the rate of change of $Dst(t)$ as a combination of two terms: decay and injection $\frac{d Dst(t)}{dt} = Q(t) - \frac{Dst(t)}{\tau}$, where Q(t) relates to the particle injection from the plasma sheet into the inner magnetosphere. 
 
 The \citet{JGR:JGR10260} model has proven to be very influential particularly due to its simplicity. Many subsequent works have modified the proposed ODE by proposing alternative expressions for the injection term $Q(t)$ [see \citet{Wang:Dst}, \citet{JGRA:JGRA14856}]. More recently \citet{Ballatore2014} have tried to generate empirical estimates for the injection and decay terms in Burton's equation.
 
 %Talk about NARMAX Dst
-Another important empirical model used to predict $Dst$ is the \emph{Nonlinear Auto-Regessive Moving Average with eXogenous inputs} (NARMAX) methodology developed in \citet{doi:10.1080/00207178908559767}, \citet{GRL:GRL13494}, \citet{GRL:GRL20944}, \citet{JGRA:JGRA18657}, \citet{balikhin:narmax}, \citet{JGRA:JGRA20661} and \citet{JGRA:JGRA50192}. The NARMAX methodology builds models by constructing polynomial expansions of inputs and determines the best combinations of monomials to include in the refined model by using a criterion called the \emph{error reduction ratio} (ERR). The parameters of the so called NARMAX OLS-ERR model are calculated using the standard \emph{ordinary least squares} (OLS) method to minimize an objective function. The reader may refer to \citet{billings2013nonlinear} for a detailed exposition of the NARMAX methodology.
+Another important empirical model used to predict $Dst$ is the \emph{Nonlinear Auto-Regessive Moving Average with eXogenous inputs} (NARMAX) methodology developed in \citet{doi:10.1080/00207178908559767}, \citet{GRL:GRL13494}, \citet{GRL:GRL20944}, \citet{JGRA:JGRA18657}, \citet{balikhin:narmax}, \citet{JGRA:JGRA20661} and \citet{JGRA:JGRA50192}. The NARMAX methodology builds models by constructing polynomial expansions of inputs and determines the best combinations of monomials to include in the refined model by using a criterion called the \emph{error reduction ratio} (ERR). The parameters of the so called NARMAX OLS-ERR model are calculated by solving the \emph{ordinary least squares} (OLS) problem arising from a quadratic objective objective function. The reader may refer to \citet{billings2013nonlinear} for a detailed exposition of the NARMAX methodology.
 
 %Talk about neural networks
-Yet another family of forecasting methods is based on \emph{Artificial Neural Networks} (ANN) that have been a popular choice for building predictive models. Researchers have employed both the standard \emph{feed forward} and the more specialized \emph{recurrent} architectures. \citet{Lund} proposed an \emph{Elman} recurrent network architecture called Lund $Dst$, which used the solar wind velocity, \emph{interplanetary magnetic field} (IMF) and historical $Dst$ data as inputs. \citet{JGRA:JGRA17461} used the recurrent neural networks to predict $Kp$. \citet{SWE:SWE286} originally proposed a \emph{feed forward} network for predicting the $K_p$ index which used the \emph{Boyle coupling function} [see \citet{boyle1997empirical}]. The same architecture is adapted for prediction of $Dst$ in \citet{SWE:SWE286}, which is popularly known as the Rice $Dst$ model. \citet{pallocchia:hal-00318011} proposed a \emph{neural network} model called EDDA to predict $Dst$ using only the IMF data.
+Yet another family of forecasting methods is based on \emph{Artificial Neural Networks} (ANN) that have been a popular choice for building predictive models. Researchers have employed both the standard \emph{feed forward} and the more specialized \emph{recurrent} architectures. \citet{Lund} proposed an \emph{Elman} recurrent network architecture called Lund $Dst$, which used the solar wind velocity, \emph{interplanetary magnetic field} (IMF) and historical $Dst$ data as inputs. \citet{JGRA:JGRA17461} used recurrent neural networks to predict $Kp$. \citet{SWE:SWE286} originally proposed a \emph{feed forward} network for predicting the $K_p$ index which used the \emph{Boyle coupling function} \citep{boyle1997empirical}. The same architecture is adapted for prediction of $Dst$ in \citet{SWE:SWE286}, popularly known as the Rice $Dst$ model. \citet{pallocchia:hal-00318011} proposed a \emph{neural network} model called EDDA to predict $Dst$ using only the IMF data.
 
 %Talk about comparison papers, number of storms covered and Persistence
-In light of the extensive list of modeling techniques employed for prediction of the $Dst$ index, model comparison and evaluation becomes a crucial direction in advancing the research domain. \citet{Rastatter2013} compare several physics based (convection, kinetic and magneto hydrodynamic) and empirical prediction models such as NARMAX, Rice $Dst$ on 4 storm events which occurred between 2001 and 2006. \citet{Amata2008} compare the EDDA and the Lund $Dst$ models over the 2003-2005 period. The most extensive model comparison in terms of storm events was probably conducted in \citet{Ji2012} which compared six $Dst$ models (see table \ref{table:DstModels}) on a list of 63 geomagnetic storm events of varying intensities which occurred between 1998 and 2006. In the comparison done in \citet{Ji2012}, the model proposed in \citet{JGRA:JGRA16300} gives the best performance on the test set considered. 
+In light of the extensive list of modeling techniques employed for prediction of the $Dst$ index, model comparison and evaluation becomes a crucial step for advancing the research domain. \citet{Rastatter2013} compared several physics based (convection, kinetic and magneto hydrodynamic) and empirical prediction models such as NARMAX, Rice $Dst$ on 4 storm events which occurred between 2001 and 2006. \citet{Amata2008} compared the EDDA and the Lund $Dst$ models over the 2003-2005 period. The most extensive model comparison in terms of storm events was probably conducted in \citet{Ji2012} which compared six $Dst$ models (see table \ref{table:DstModels}) on a list of 63 geomagnetic storm events of varying intensities which occurred between 1998 and 2006. In the comparison done in \citet{Ji2012}, the model proposed in \citet{JGRA:JGRA16300} gives the best performance on the test set considered. 
 
 %Vision
-In $Dst$ prediction, a seemingly trivial yet highly informative prediction method is represented by the so called \emph{Persistence} model, which uses the previous value of $Dst$ as the prediction for the next time step ($\hat{D}st(t) = Dst(t-1)$). Due to high correlation between $Dst$ values one hour apart ($Dst(t)$, $Dst(t-1)$), despite its apparent lack of sophistication the \emph{Persistence} model gives excellent predictive performance on error metrics. In essence it is a trivial hypothesis and hence it should always be used as a base line to compare the performance of any proposed $Dst$ algorithm. Moreover, given its zero computational cost, a model should at least outperform the \emph{Persistence} model in order to be a viable candidate for advancing the science of space weather prediction.
+In $Dst$ prediction, a seemingly trivial yet highly informative prediction method is represented by the so called \emph{Persistence} model, which uses the previous value of $Dst$ as the prediction for the next time step ($\hat{D}st(t) = Dst(t-1)$). Due to high correlation between $Dst$ values one hour apart ($Dst(t)$, $Dst(t-1)$), the \emph{Persistence} model gives excellent predictive performance on error metrics, despite its apparent lack of sophistication. In essence it is a trivial hypothesis and hence it should always be used as a base line to compare the performance of any proposed $Dst$ algorithm. Moreover, given its zero computational cost, a model should at least outperform the \emph{Persistence} model in order to be a viable candidate for advancing the science of space weather prediction. An obvious critique to the Persistence model is that it is not really predictive, in the sense that it cannot forecast a storm, until it has already commenced. However, most of the literature has used global metrics, such as the Root Mean Square Error (RMSE, see section \ref{sec:exp}) to evaluate models. It is in this context that we argue that the Persistence model should be regarded as the first candidate to outperform.
 
 %Assertion
-In this paper, we propose \emph{Gaussian Process} models for OSA prediction of $Dst$. We use the results of \citet{Ji2012} as a starting point and compare our proposed models with the methods outlined in the same paper while using the performance of the \emph{Persistence} model as a base line. 
+In this paper, we propose \emph{Gaussian Process} models for OSA prediction of $Dst$. We use the results of \citet{Ji2012} as a starting point and compare our proposed models with the methods evaluated in that paper, while using the performance of the \emph{Persistence} model as a base line. 
 
 % Talk about Gaussian Process
-We use the hourly resolution data as extracted from NASA/GSFC's OMNI data set through OMNIWeb (see \cite{OmniPaper}). The rest of the paper is organized as follows. Section \ref{sec:method} gives an introduction to the \emph{Gaussian Process} methodology for regression and some technical details on their application. In section \ref{sec:osa} two different \emph{Gaussian Process} auto-regressive models are proposed and subsequently in sections \ref{sec:exp} and \ref{sec:res}, bench marked against the \emph{Persistence} $Dst$ model as well as the other models outlined in \citet{Ji2012}.
+We use hourly resolution measurements extracted from NASA/GSFC's OMNI data set through OMNIWeb \citep{OmniPaper}. The rest of the paper is organized as follows. Section \ref{sec:method} gives an introduction to the \emph{Gaussian Process} methodology for regression and some technical details about their application. In section \ref{sec:osa} two different \emph{Gaussian Process} auto-regressive models are proposed and subsequently in sections \ref{sec:exp} and \ref{sec:res}, bench marked against the \emph{Persistence} as well as the other models outlined in \citet{Ji2012}.
 
   
 \section{Methodology: Gaussian Process} \label{sec:method}
@@ -179,7 +179,7 @@ We use the hourly resolution data as extracted from NASA/GSFC's OMNI data set th
 
 Let us assume that we want to model a process in which a scalar quantity $y$ is described by $y = f(\mathbf{x}) + \epsilon$ where   $f(.): \mathbb{R}^d \rightarrow \mathbb{R}$ is an unknown scalar function of a multidimensional input vector $\mathbf{x} \in \mathbb{R}^d$, and $\epsilon \sim \mathcal{N}(0, \sigma^2)$ is Gaussian distributed noise with variance $\sigma^2$.
 
-On the basis of a set of labeled data points ${(\mathbf{x}_i, y_i); i = 1 \cdots N}$ which can be conveniently expressed by $\mathbf{X}$ a $N \times d$ data matrix and $\mathbf{y}$ a $N \times 1$ response vector as shown in equations \ref{eq:feat} and \ref{eq:labels}.
+A set of labeled data points ${(\mathbf{x}_i, y_i); i = 1 \cdots N}$ can be conveniently expressed by a $N \times d$ data matrix $\mathbf{X}$ and a $N \times 1$ response vector $\mathbf{y}$, as shown in equations (\ref{eq:feat}) and (\ref{eq:labels}).
 
 \begin{eqnarray}
   \mathbf{X} & = & \left( \begin{array}{c} \mathbf{x}^{T}_1 \\ \mathbf{x}^{T}_2 \\ \vdots \\ \mathbf{x}^{T}_n \end{array} \right)_{n \times d} \label{eq:feat} \\
@@ -187,7 +187,7 @@ On the basis of a set of labeled data points ${(\mathbf{x}_i, y_i); i = 1 \cdots
   \mathbf{y} & = & \left( \begin{array}{c} y_1 \\ y_2 \\ \vdots \\ y_N \end{array} \right) _{n \times 1} \label{eq:labels}
 \end{eqnarray}
 
-Out task is to infer the the values of the unknown function $f(.)$ based on the inputs $\mathbf{X}$ and the noisy observations $\mathbf{y}$. We now assume that the joint distribution of $f(\mathbf{x}_i), i = 1 \cdots N$ is multivariate Gaussian as shown in equations \ref{eq:fvalues}, \ref{eq:normal} and \ref{eq:sto}.
+Our task is to infer the values of the unknown function $f(.)$ based on the inputs $\mathbf{X}$ and the noisy observations $\mathbf{y}$. We now assume that the joint distribution of $f(\mathbf{x}_i), i = 1 \cdots N$ is a multivariate Gaussian as shown in equations (\ref{eq:fvalues}), (\ref{eq:normal}) and (\ref{eq:sto}).
 
 \begin{eqnarray}
  \mathbf{f} & = & \left( \begin{array}{c} f(\mathbf{x}_1) \\ f(\mathbf{x}_2) \\ \vdots \\ f(\mathbf{x}_N) \end{array} \right) \label{eq:fvalues}\\
@@ -197,12 +197,12 @@ Out task is to infer the the values of the unknown function $f(.)$ based on the 
  p( \mathbf{f} \ | \ \mathbf{x}_1, \cdots, \mathbf{x}_N) & = & \frac{1}{(2\pi)^{n/2} det(\mathbf{\Lambda})^{1/2}} exp \left(-\frac{1}{2} (\mathbf{f} - \mathbf{\mu})^T \mathbf{\Lambda}^{-1} (\mathbf{f} - \mathbf{\mu}) \right) \label{eq:sto}
 \end{eqnarray}
 
-Here $\mathbf{f}$ is an $N\times 1$ vector consisting of the values $f(\mathbf{x}_i), i = q \cdots N$. In equation \ref{eq:normal} $\mathbf{f}|\mathbf{x}_1, \cdots, \mathbf{x}_N$ denotes the conditional distribution of $\mathbf{f}$ with respect to the input data (i.e. $\mathbf{X}$) and $\mathcal{N}\left( \mathbf{\mu}, \mathbf{\Lambda} \right)$ represents a multivariate Gaussian distribution with mean vector $\mathbf{\mu}$ and covariance matrix $\mathbf{\Lambda}$. The probability density function of this distribution $p( \mathbf{f} \ | \ \mathbf{x}_1, \cdots, \mathbf{x}_N)$ is therefore given by equation \ref{eq:sto}.
+Here $\mathbf{f}$ is a $N\times 1$ vector consisting of the values $f(\mathbf{x}_i), i = 1 \cdots N$. In equation (\ref{eq:normal}), $\mathbf{f}|\mathbf{x}_1, \cdots, \mathbf{x}_N$ denotes the conditional distribution of $\mathbf{f}$ with respect to the input data (i.e., $\mathbf{X}$) and $\mathcal{N}\left( \mathbf{\mu}, \mathbf{\Lambda} \right)$ represents a multivariate Gaussian distribution with mean vector $\mathbf{\mu}$ and covariance matrix $\mathbf{\Lambda}$. The probability density function of this distribution $p( \mathbf{f} \ | \ \mathbf{x}_1, \cdots, \mathbf{x}_N)$ is therefore given by equation (\ref{eq:sto}).
 
-From equation \ref{eq:sto}, one can observe that in order to uniquely define the distribution of the process, it is required to specify $\mathbf{\mu}$ and $\mathbf{\Lambda}$. For this probability density to be valid, there is a further requirements imposed on $\mathbf{\Lambda}$: 
+From equation (\ref{eq:sto}), one can observe that in order to uniquely define the distribution of the process, it is required to specify $\mathbf{\mu}$ and $\mathbf{\Lambda}$. For this probability density to be valid, there are further requirements imposed on $\mathbf{\Lambda}$: 
 
 \begin{enumerate}
-      \item Symmetry: $\mathbf{\Lambda}_{ij} = \mathbf{\Lambda}_{ij} \ \forall i,j \in {1, \cdots, N} $ 
+      \item Symmetry: $\mathbf{\Lambda}_{ij} = \mathbf{\Lambda}_{ji} \ \forall i,j \in {1, \cdots, N} $ 
       \item Positive Semi-definiteness: $\mathbf{z}^T \mathbf{\Lambda} \mathbf{z} \geq 0 \ \forall \mathbf{z} \in \mathbb{R}^N$  
 \end{enumerate}
 
@@ -213,7 +213,7 @@ Inspecting the individual elements of $\mathbf{\mu}$ and $\mathbf{\Lambda}$, we 
       \Lambda_{ij} & = & \mathbb{E}[(f(\mathbf{x}_i) - \mu_i)(f(\mathbf{x}_j) - \mu_j)] := K(\mathbf{x}_i, \mathbf{x}_j)
 \end{eqnarray}
 
-Here $\mathbb{E}$ denotes the expectation (average). The elements of $\mathbf{\mu}$ and $\mathbf{\Lambda}$ are expressed as functions $m(\mathbf{x}_i)$ and $K(\mathbf{x}_i, \mathbf{x}_j)$ of the inputs $\mathbf{x}_i,\ \mathbf{x}_j$. Specifying the functions $m(\mathbf{x})$ and $K(\mathbf{x}, \mathbf{x}')$ completely specifies each element of $\mathbf{\mu}$ and $\mathbf{\Lambda}$ and subsequently the finite dimensional distribution of $\mathbf{f} | \mathbf{x}_1, \cdots, \mathbf{x}_N $. In most practical applications of \emph{Gaussian Processes} the mean function is often defined as $m(\mathbf{x}) = 0$, which is not unreasonable if the data is standardized to have zero mean. \emph{Gaussian Processes} are represented in machine learning literature using the following notation.
+Here $\mathbb{E}$ denotes the expectation (average). The elements of $\mathbf{\mu}$ and $\mathbf{\Lambda}$ are expressed as functions $m(\mathbf{x}_i)$ and $K(\mathbf{x}_i, \mathbf{x}_j)$ of the inputs $\mathbf{x}_i,\ \mathbf{x}_j$. Specifying the functions $m(\mathbf{x})$ and $K(\mathbf{x}, \mathbf{x}')$ completely specifies each element of $\mathbf{\mu}$ and $\mathbf{\Lambda}$ and subsequently the finite dimensional distribution of $\mathbf{f} | \mathbf{x}_1, \cdots, \mathbf{x}_N $. In most practical applications of \emph{Gaussian Processes} the mean function is often defined as $m(\mathbf{x}) = 0$, which is not unreasonable if the data is standardized to have zero mean. \emph{Gaussian Processes} are represented in machine learning literature using the following notation:
 
 \begin{equation}
     f(\mathbf{x}) \sim \mathcal{GP}(m(\mathbf{x}), K(\mathbf{x}, \mathbf{x}'))
@@ -221,58 +221,63 @@ Here $\mathbb{E}$ denotes the expectation (average). The elements of $\mathbf{\m
 
 \subsection{Inference and Predictions} \label{sec:inference}
 
-Our aim is to infer the function $f(\mathbf{x})$ from the noisy training data and generate predictions $f(\mathbf{x}^{*}_i)$ for a set of test points $ {\mathbf{x}^{*}_i : \forall i \in 1, \cdots, M} $. We define $\mathbf{X}^*$ as the test data matrix whose rows are formed by $\mathbf{x}^{*}_i$ as shown in equation \ref{eq:testfeat}. Using the multivariate Gaussian distribution in equation \ref{eq:sto} we can construct the distribution of $f(\mathbf{x})$ over the training and test points. The vector of training and test outputs $\left( \begin{array}{c} \mathbf{y} \\ \mathbf{f_*} \end{array} \right)$ is of dimension $(N+M) \times 1$ and is constructed by appending the test set predictions $\mathbf{f}_*$ to the observed noisy measurements $\mathbf{y}$.
+Our aim is to infer the function $f(\mathbf{x})$ from the noisy training data and generate predictions $f(\mathbf{x}^{*}_i)$ for a set of test points $ {\mathbf{x}^{*}_i : \forall i \in 1, \cdots, M} $. We define $\mathbf{X}^*$ as the test data matrix whose rows are formed by $\mathbf{x}^{*}_i$ as shown in equation (\ref{eq:testfeat}). 
+\begin{equation}
+    \mathbf{X}_* = \left( \begin{array}{c} (\mathbf{x}^{*}_1)^T \\ (\mathbf{x}^{*}_2)^T \\ \vdots \\ (\mathbf{x}^{*}_M)^T \end{array} \right)_{M \times d} \label{eq:testfeat} 
+\end{equation}
+Using the multivariate Gaussian distribution in equation (\ref{eq:sto}) we can construct the joint distribution of $f(\mathbf{x})$ over the training and test points. The vector of training and test outputs $\left( \begin{array}{c} \mathbf{y} \\ \mathbf{f_*} \end{array} \right)$ is of dimension $(N+M) \times 1$ and is constructed by appending the test set predictions $\mathbf{f}_*$ to the observed noisy measurements $\mathbf{y}$.
 
 \begin{eqnarray}
-    \mathbf{X}_* & = & \left( \begin{array}{c} (\mathbf{x}^{*}_1)^T \\ (\mathbf{x}^{*}_2)^T \\ \vdots \\ (\mathbf{x}^{*}_M)^T \end{array} \right)_{M \times d} \label{eq:testfeat} \\
     \mathbf{f}_* & = & \left( \begin{array}{c} f(\mathbf{x^{*}_1}) \\ f(\mathbf{x^{*}_2}) \\ \vdots \\ f(\mathbf{x^{*}_M}) \end{array} \right)_{M \times 1} \\
      \vspace{4\baselineskip}
     \left( \begin{array}{c} \mathbf{y} \\ \mathbf{f_*} \end{array} \right) | \ \ \mathbf{X}, \mathbf{X}_* & \sim & 
     \mathcal{N}\left(\mathbf{0}, \left[ \begin{array}{cc} \mathbf{K} + \sigma^{2} \mathbf{I} & \mathbf{K}_{*} \\ \mathbf{K}_{*}^T & \mathbf{K}_{**} \end{array} \right ] \right) \label{eq:dist}
 \end{eqnarray}
 
-Since we have noisy measurements of $f$ over the training data, we add the noise variance $\sigma^2$ to the variance of $f$ as shown in \ref{eq:dist}. The block matrix components of the $(N+M) \times (N+M)$ covariance matrix have the following structure.
+Since we have noisy measurements of $f$ over the training data, we add the noise variance $\sigma^2$ to the variance of $f$ as shown in (\ref{eq:dist}). The block matrix components of the $(N+M) \times (N+M)$ covariance matrix have the following structure.
 
 \begin{enumerate}
       \item $\mathbf{I}$: The $n \times n$ identity matrix.
-      \item $\mathbf{K} = [K(\mathbf{x}_i, \mathbf{x}_j)], \ i,j \in 1,\cdots,n$ : Kernel matrix constructed from all couples of the training data.
+      \item $\mathbf{K} = [K(\mathbf{x}_i, \mathbf{x}_j)], \ i,j \in 1,\cdots,n$ : Kernel matrix constructed from all couples obtained from the training data.
       \item $\mathbf{K}_{*} = [K(\mathbf{x}_i, \mathbf{x}^{*}_j)], \ i \in 1,\cdots,n ; j \in 1,\cdots,m$ : Cross kernel matrix constructed from all couples between training and test data points.
-      \item $\mathbf{K}_{**} = [K(\mathbf{x}^{*}_i, \mathbf{x}^{*}_j)], \ i,j \in 1,\cdots,m$: Kernel matrix constructed from all couples of the test data.
+      \item $\mathbf{K}_{**} = [K(\mathbf{x}^{*}_i, \mathbf{x}^{*}_j)], \ i,j \in 1,\cdots,m$: Kernel matrix constructed from all couples obtained from the test data.
 \end{enumerate}
 
-With the multivariate normal distribution defined in equation \ref{eq:dist}, probabilistic predictions $f_*$ can be generated by constructing the conditional distribution $\mathbf{f_*}|\mathbf{X},\mathbf{y},\mathbf{X_*}$. Since the original distribution of $\left( \begin{array}{c} \mathbf{y} \\ \mathbf{f_*} \end{array} \right) | \ \ \mathbf{X}, \mathbf{X}_*$ is a multivariate Gaussian, conditioning on a subset of elements $\mathbf{y}$ yields another Gaussian distribution whose mean and covariance can be calculated exactly in equation \ref{eq:posterior} (see \citet{Rasmussen:2005:GPM:1162254}).
-
+With the multivariate normal distribution defined in equation (\ref{eq:dist}), probabilistic predictions $f_*$ can be generated by constructing the conditional distribution $\mathbf{f_*}|\mathbf{X},\mathbf{y},\mathbf{X_*}$. Since the original distribution of $\left( \begin{array}{c} \mathbf{y} \\ \mathbf{f_*} \end{array} \right) | \ \ \mathbf{X}, \mathbf{X}_*$ is a multivariate Gaussian, conditioning on a subset of elements: $\mathbf{y}$ yields another Gaussian distribution whose mean and covariance can be calculated exactly, as in equation (\ref{eq:posterior}) (see \citet{Rasmussen:2005:GPM:1162254}).
+\begin{equation}
+    \mathbf{f_*}|\mathbf{X},\mathbf{y},\mathbf{X_*} \sim \mathcal{N}(\mathbf{\bar{f}_*}, \Sigma_*)  \label{eq:posterior},
+\end{equation}
+where
 \begin{eqnarray}
-    \mathbf{f_*}|\mathbf{X},\mathbf{y},\mathbf{X_*} & \sim & \mathcal{N}(\mathbf{\bar{f}_*}, \Sigma_*)  \label{eq:posterior} \\
     \mathbf{\bar{f}_*} & = & \mathbf{K}^T_{*} [\mathbf{K} + \sigma^{2} \mathbf{I}]^{-1} \mathbf{y} \label{eq:posteriormean} \\
     \Sigma_* & = & \mathbf{K}_{**} - \mathbf{K}^T_{*} \left(\mathbf{K} + \sigma^{2} \mathbf{I}\right)^{-1} \mathbf{K}_{*} \label{eq:posteriorcov}
 \end{eqnarray}
 
-The practical implementation of \emph{Gaussian Process} models requires the inversion of the training data kernel matrix $[\mathbf{K} + \sigma^{2} \mathbf{I}]^{-1}$ to calculate the parameters of the predictive distribution $\mathbf{f_*}|\mathbf{X},\mathbf{y},\mathbf{X_*}$. The computational complexity of this inference is dominated by the linear problem $\mathbf{K}^T_{*} [\mathbf{K} + \sigma^{2} \mathbf{I}]^{-1} \mathbf{y}$, this can be done via Cholesky decomposition which has time complexity $O(N^3)$.
+The practical implementation of \emph{Gaussian Process} models requires the inversion of the training data kernel matrix $[\mathbf{K} + \sigma^{2} \mathbf{I}]^{-1}$ to calculate the parameters of the predictive distribution $\mathbf{f_*}|\mathbf{X},\mathbf{y},\mathbf{X_*}$. The computational complexity of this inference is dominated by the linear problem $\mathbf{K}^T_{*} [\mathbf{K} + \sigma^{2} \mathbf{I}]^{-1} \mathbf{y}$, which can be solved via Cholesky decomposition, with a time complexity of $O(N^3)$, where $N$ is the number of data points.
 
-The distribution of $\mathbf{f_*}| \mathbf{X},\mathbf{y},\mathbf{X_*}$ is known in Bayesian analysis as the \emph{Posterior Predictive Distribution}. This illustrates a key difference between \emph{Gaussian Processes} and other regression models such as \emph{Neural Networks}, \emph{Linear Models} and \emph{Support Vector Machines}, that a \emph{Gaussian Process} model does not generate point predictions for new data but outputs a predictive distribution for the quantity sought, this allows us to construct error bars on the predictions. This property of Bayesian models such as \emph{Gaussian Processes} makes them suitable for Space Weather forecasting applications. 
+The distribution of $\mathbf{f_*}| \mathbf{X},\mathbf{y},\mathbf{X_*}$ is known in Bayesian analysis as the \emph{Posterior Predictive Distribution}. This illustrates a key difference between \emph{Gaussian Processes} and other regression models such as \emph{Neural Networks}, \emph{Linear Models} and \emph{Support Vector Machines}: a \emph{Gaussian Process} model does not generate point predictions for new data but outputs a predictive distribution for the quantity sought, thus allowing to construct error bars on the predictions. This property of Bayesian models such as \emph{Gaussian Processes} makes them very appealing for Space Weather forecasting applications. 
 
-The central design issue in applying \emph{Gaussian Process} models is choice of the function $K(\mathbf{x}, \mathbf{x}')$. The same constraints that apply to $\mathbf{\Lambda}$ also apply to the function $K(.,.)$. In machine learning, these symmetric positive definite functions of two variables are known as \emph{kernels}. Kernel based methods are applied extensively in data analysis i.e. regression, clustering, classification, density estimation (see \citet{Scholkopf:2001:LKS:559923}, \citet{hofmann2008}).
+The central design issue in applying \emph{Gaussian Process} models is the choice of the function $K(\mathbf{x}, \mathbf{x}')$. The same constraints that apply to $\mathbf{\Lambda}$ also apply to the function $K$. In machine learning, these symmetric positive definite functions of two variables are known as \emph{kernels}. Kernel based methods are applied extensively in data analysis i.e. regression, clustering, classification, density estimation (see \citet{Scholkopf:2001:LKS:559923}, \citet{hofmann2008}).
 
 \subsection{Kernel Functions}
 
-For the success of a Gaussian Process model an appropriate choice of kernel function is paramount. The symmetry and positive semi-definiteness of \emph{Gaussian Process} kernels implies that they represent inner-products between some basis function representation of the data. The interested reader is suggested to refer to \cite{Berlinet2004}, \citet{Scholkopf:2001:LKS:559923} and \citet{hofmann2008} for a thorough treatment on kernel functions and the rich theory behind them. Some common kernel functions used in machine learning include the radial basis function (RBF) kernel $K(\mathbf{x}, \mathbf{y}) = \frac{1}{2} exp(-||\mathbf{x} - \mathbf{y}||^2/l^2)$ and the polynomial kernel $K(\mathbf{x}, \mathbf{y}) = (\mathbf{x}^\intercal \mathbf{y} + b)^d$. 
+For the success of a \emph{Gaussian Process} model an appropriate choice of kernel function is paramount. The symmetry and positive semi-definiteness of \emph{Gaussian Process} kernels implies that they represent inner-products between some basis function representation of the data. The interested reader is suggested to refer to \cite{Berlinet2004}, \citet{Scholkopf:2001:LKS:559923} and \citet{hofmann2008} for a thorough treatment of kernel functions and the rich theory behind them. Some common kernel functions used in machine learning include the radial basis function (RBF) kernel $K(\mathbf{x}, \mathbf{y}) = \frac{1}{2} exp(-||\mathbf{x} - \mathbf{y}||^2/l^2)$ and the polynomial kernel $K(\mathbf{x}, \mathbf{y}) = (\mathbf{x}^\intercal \mathbf{y} + b)^d$. 
 
-The quantities $l$ in the RBF, $b$ and $d$ in the polynomial kernel are known as \emph{hyper-parameters}. Hyper-parameters give flexibility to particular kernel structure, for example $d = 1, 2, 3, \cdots$ in the polynomial kernel represents linear, quadratic, cubic and higher order polynomials respectively. The method of assigning values to the \emph{hyper-parameter} is crucial in the model building process. 
+The quantities $l$ in the RBF, and $b$ and $d$ in the polynomial kernel are known as \emph{hyper-parameters}. Hyper-parameters give flexibility to particular kernel structure, for example $d = 1, 2, 3, \cdots$ in the polynomial kernel represents linear, quadratic, cubic and higher order polynomials respectively. The method of assigning values to the \emph{hyper-parameters} is crucial in the model building process. 
 
-In this study, we construct Gaussian Process regression models with linear kernels as shown in equation \ref{eq:usedKernel}, for \emph{one step ahead} prediction of the $Dst$ index. Our choice of kernel leaves us with only one adjustable hyper-parameter, the model noise $\sigma$. 
+In this study, we construct Gaussian Process regression models with linear kernels as shown in equation (\ref{eq:usedKernel}), for \emph{one step ahead} prediction of the $Dst$ index. Our choice of kernel leaves us with only one adjustable hyper-parameter, the model noise $\sigma$. 
 
 \begin{equation}\label{eq:usedKernel}
     K(\mathbf{x}, \mathbf{y}) = \mathbf{x}^\intercal \mathbf{y}
 \end{equation}
 
-We initialize a grid of values for $\sigma$ the model noise and use the error on a predefined validation data set to choose the best performing value of $\sigma$. While constructing the grid of possible values for $\sigma$ it must be ensured that $\sigma > 0$ so that the kernel matrix constructed on the training data is non-singular.
+We initialize a grid of values for the model noise $\sigma$ and use the error on a predefined validation data set to choose the best performing value of $\sigma$. While constructing the grid of possible values for $\sigma$ it must be ensured that $\sigma > 0$ so that the kernel matrix constructed on the training data is non-singular.
 
 \section{One Step Ahead Prediction} \label{sec:osa}
 
-Below in equations \ref{eq:Dst}, \ref{eq:GPNoise}, \ref{eq:DstGP}, \ref{eq:GPPoly} we outline a \emph{Gaussian Process} formulation for \emph{OSA} prediction of $Dst$. A vector of features $x_{t-1}$ is used as input to an unknown function $f(x_{t-1})$ which drawn from a \emph{Gaussian Process} driven by a linear polynomial kernel. 
+Below in equations (\ref{eq:Dst}) - (\ref{eq:GPPoly}) we outline a \emph{Gaussian Process} formulation for \emph{OSA} prediction of $Dst$. A vector of features $x_{t-1}$ is used as input to an unknown function $f(x_{t-1})$.
 
-The features $x_{t-1}$ can be any collection of quantities in the hourly resolution Omni data set. Generally $x_{t-1}$ are time histories of $Dst$ or other important variables examples being plasma pressure $p(t)$, solar wind speed $V(t)$, z component of the interplanetary magnetic field $B_z(t)$.
+The features $x_{t-1}$ can be any collection of quantities in the hourly resolution OMNI data set. Generally $x_{t-1}$ are time histories of $Dst$ and other important variables such as plasma pressure $p(t)$, solar wind speed $V(t)$, z component of the interplanetary magnetic field $B_z(t)$.
 
 \begin{eqnarray}
     Dst(t) & = & f(\mathbf{x}_{t-1}) + \epsilon \label{eq:Dst} \\
@@ -281,29 +286,29 @@ The features $x_{t-1}$ can be any collection of quantities in the hourly resolut
     K(\mathbf{x}, \mathbf{y}) & = & \mathbf{x}^\intercal \mathbf{y} + b \label{eq:GPPoly}
 \end{eqnarray}
 
-In \ref{sec:gpar} and \ref{sec:gparx} below we consider two choices for the input features $\mathbf{x}_{t-1}$ leading to two variants of \emph{Gaussian Process} regression for $Dst$ time series prediction.
+In the following we consider two choices for the input features $\mathbf{x}_{t-1}$ leading to two variants of \emph{Gaussian Process} regression for $Dst$ time series prediction.
 
 \subsection{Gaussian Process Auto-Regressive (GP-AR)} \label{sec:gpar}
 
 The simplest auto-regressive models for \emph{OSA} prediction of $Dst$ are those that use only the history of $Dst$ to construct input features for model training. The input features $\mathbf{x}_{t-1}$ at each time step are the history of $Dst(t)$ until a time lag of $p$ hours.
 
 \begin{eqnarray*}
-    \mathbf{x}_t & = & \left(Dst(t), Dst(t-1), \cdots , Dst(t-p+1)\right)
+    \mathbf{x}_{t-1} & = & \left(Dst(t-1), \cdots , Dst(t-p+1)\right)
 \end{eqnarray*}
 
 \subsection{Gaussian Process Auto-Regressive with eXogenous inputs (GP-ARX)} \label{sec:gparx}
 
-Auto-regressive models can be improved by including exogenous quantities that can help in improving predictions. $Dst$ gives a measure of ring currents, which are modulated by plasma sheet particle injections into the inner magnetosphere during sub-storms. Studies have shown that the substorm occurrence rate increases with solar wind velocity (high speed streams) (\citet{Kissinger2011}, \citet{Newell2016}). Prolonged southward interplanetary magnetic field (IMF) z-component ($B_z$) is needed for sub-storm to occur (\citet{McPherron1986}). An increase in the solar wind electric field, $VB_z$, can increase the dawn-dusk electric field in the magnetotail, which in turn determines the amount of plasma sheet particle that move to the inner magnetosphere (\citet{Friedel2001}). Therefore, our exogenous parameters consist of solar wind velocity, IMF $B_z$, and $VB_z$.   
+Auto-regressive models can be augmented by including exogenous quantities in the inputs $\mathbf{x}_{t-1}$ at each time step, in order to improve predictive accuracy. $Dst$ gives a measure of ring currents, which are modulated by plasma sheet particle injections into the inner magnetosphere during sub-storms. Studies have shown that the substorm occurrence rate increases with solar wind velocity (high speed streams) \citep{Kissinger2011,Newell2016}. Prolonged southward interplanetary magnetic field (IMF) z-component ($B_z$) is needed for sub-storms to occur \citep{McPherron1986}. An increase in the solar wind electric field, $VB_z$, can increase the dawn-dusk electric field in the magnetotail, which in turn determines the amount of plasma sheet particle that move to the inner magnetosphere \citep{Friedel2001}. Therefore, our exogenous parameters consist of solar wind velocity, IMF $B_z$, and $VB_z$.   
 
 %It is well known that the solar wind and interplanetary magnetic field are important factors that influence the Earth's geomagnetic state (\citet{JGRA:JGRA11775}, \citet{Russell1974}, \citet{JGRA:JGRA17574}).
 
-Hourly solar wind velocity $V(t)$ and interplanetary magnetic field $B_z(t)$ recorded by the ACE satellite are used as the exogenous inputs of the model, along with the time history of $Dst$. In this model we choose distinct time lags $p$ and $p_{ex}$ for auto-regressive and exogenous variables respectively. In addition we explicitly include the product $V B_z$ which is a proxy for the electric field, as an input.
+In this model we choose distinct time lags $p$ and $p_{ex}$ for auto-regressive and exogenous variables respectively. In addition we explicitly include the product $V B_z$ which is a proxy for the electric field, as an input.
     
 \begin{eqnarray*}
-        & \mathbf{x}_t & = (Dst(t), Dst(t-1), \cdots , Dst(t-p+1), \\
-        & \ \ \ \ \ & V(t), V(t-1), \cdots, V(t-p_{ex}+1),\\
-        & \ \ \ \ \ & B_{z}(t), B_{z}(t-1), \cdots, B_{z}(t-p_{ex}+1),\\
-        & \ \ \ \ \ & V B_{z}(t), V B_{z}(t-1), \cdots, V B_{z}(t-p_{ex}+1))
+        & \mathbf{x}_{t-1} & = (Dst(t-1), \cdots , Dst(t-p+1), \\
+        & \ \ \ \ \ & V(t-1), \cdots, V(t-p_{ex}+1),\\
+        & \ \ \ \ \ & B_{z}(t-1), \cdots, B_{z}(t-p_{ex}+1),\\
+        & \ \ \ \ \ & V B_{z}(t-1), \cdots, V B_{z}(t-p_{ex}+1))
 \end{eqnarray*}
 
 \section{Model Training and Validation}
@@ -323,25 +328,36 @@ The time lags chosen for \emph{GP-AR} are $p = 6$ while for \emph{GP-ARX} $p=6$,
 
 \section{Experiments} \label{sec:exp}
 
-\citet{Ji2012} compare six \emph{one step ahead} $Dst$ models as listed in table \ref{table:DstModels} in their paper by compiling a list of 63 geomagnetic storm events of varying strengths which occurred from 1998-2006. This serves as an important stepping stone for a systematic comparison of existing and new prediction techniques because performance metrics are averaged over a large number of storm events that occurred over a 8 year period. They compare the averaged performance of these models on four key performance metrics.
+\citet{Ji2012} compare six \emph{one step ahead} $Dst$ models as listed in table \ref{table:DstModels} in their paper by compiling a list of 63 geomagnetic storm events of varying strengths which occurred in the period 1998-2006. This serves as an important stepping stone for a systematic comparison of existing and new prediction techniques because performance metrics are averaged over a large number of storm events that occurred over a 8 year period. They compare the averaged performance of these models on four key performance metrics.
 
 \begin{enumerate}
     \item The root mean square error.
     \begin{equation}
-        RMSE = \sqrt{\sum_{i=1}^{n} (y - \hat{y})^2 / n}
+        RMSE = \sqrt{\sum_{t=1}^{n} (Dst(t) - \hat{D}st(t))^2 / n}
     \end{equation}
     \item Correlation coefficient between the predicted and actual value of $Dst$.
     \begin{equation}
-        CC = Cov(y \hat{y})/\sqrt{Var(y) Var(\hat{y})}
+        CC = Cov(Dst, \hat{D}st)/\sqrt{Var(y) Var(\hat{D}st)}
     \end{equation}
     \item The error in prediction of the peak negative value of $Dst$ for a storm event.
     \begin{equation}
-        \Delta Dst_{min} = Dst(t^*) - \hat{D}st(t^*), \ t^* = argmin(Dst(t))
+        \Delta Dst_{min} = Dst(t^*) - \hat{D}st(t^{**}), \ t^* = argmin(Dst(t)),\ t^{**} = argmin(\hat{D}st(t))
     \end{equation}
-    \item The error in predicting the timing of a storm peak, also called \emph{timing error} $|\Delta t_{peak}|$. 
+    \item The error in predicting the timing of a storm peak, also called \emph{timing error} $|\Delta t_{peak}|$.
+    \begin{equation}
+        \Delta t_{peak} = \mathit{argmin}_{t}(D_{st}(t)) - \mathit{argmin}_t(\hat{D}_{st}(t)), \ \ t \in \{1, \cdots, n\}
+    \end{equation}
 \end{enumerate}
 
 Apart from the metrics above, we also generate the empirical distribution of relative errors $|\frac{Dst - \hat{Dst}}{Dst}|$ for the \emph{GP-AR}, \emph{GP-ARX}, \emph{NM} and \emph{TL} models.
+
+
+\begin{figure}
+   \centering
+   \includegraphics[width=\textwidth]{Compare_CC.png}
+      \caption{Averaged cross correlation performance of \emph{GP-AR}, \emph{GP-ARX} and the \emph{Persistence} model versus results in \citet{Ji2012}.}
+         \label{fig:cc}
+\end{figure}
 
 \subsection{Model Comparison}
 
@@ -371,18 +387,7 @@ For the purpose of generating the cumulative probability plots of the model erro
          \end{tabular}
 \end{table}
 
-\begin{figure}
-   \centering
-   \includegraphics[width=\textwidth]{Compare_CC.png}
-      \caption{Averaged cross correlation performance of \emph{GP-AR}, \emph{GP-ARX} and the \emph{Persistence} model versus results in \citet{Ji2012}.}
-         \label{fig:cc}
-\end{figure}
-
-
 With respect to the \emph{TL} model one important caveat must be noted. The training of the \emph{TL} model was performed on the OMNI data from 1996-2002 which overlaps with a large number of the storm events, therefore the experimental procedure has a strong bias towards \emph{TL} model.
-
-\section{Results} \label{sec:res}
-%%  This two-panel figure was inserted by JFW to demonstrate the subfigure and epstopdf packages
 
 \begin{figure}
    \centering
@@ -391,7 +396,11 @@ With respect to the \emph{TL} model one important caveat must be noted. The trai
          \label{fig:deltaDst}
    \end{figure}
 
-Figures \ref{fig:rmse}, \ref{fig:cc}, \ref{fig:deltaDst} and \ref{fig:timingErr} compare the performance of \emph{GP-AR}, \emph{GP-ARX} and the \emph{Persistence} model with the existing results of \citet{Ji2012}. Figure \ref{fig:rmse} compares the average RMSE of the predictions over the list of 63 storms. One can see that the \emph{GP-ARX} model gives an improvement of approximately $38\%$ in RMSE with respect to the \emph{TL} model and $60\%$ improvement with respect to the \emph{NM} model. It can also be seen that the \emph{Persistence} model gives better \emph{RMSE} performance than the models compared in \citet{Ji2012}.
+\section{Results} \label{sec:res}
+%%  This two-panel figure was inserted by JFW to demonstrate the subfigure and epstopdf packages
+
+
+Figures \ref{fig:rmse}, \ref{fig:cc}, \ref{fig:deltaDst} and \ref{fig:timingErr} compare the performance of \emph{GP-AR}, \emph{GP-ARX} and the \emph{Persistence} model with the existing results of \citet{Ji2012}. Figure \ref{fig:rmse} compares the average RMSE of the predictions over the list of 63 storms. One can see that the \emph{GP-ARX} model gives an improvement of approximately $40\%$ in RMSE with respect to the \emph{TL} model and $62\%$ improvement with respect to the \emph{NM} model. It can also be seen that the \emph{Persistence} model gives better \emph{RMSE} performance than the models compared in \citet{Ji2012}.
 
 \begin{figure}
    \centering
@@ -400,7 +409,7 @@ Figures \ref{fig:rmse}, \ref{fig:cc}, \ref{fig:deltaDst} and \ref{fig:timingErr}
          \label{fig:timingErr}
    \end{figure}
 
-Figure \ref{fig:cc} shows the comparison of correlation coefficients between model predictions and actual $Dst$ values. From the results of \citet{Ji2012}, the \emph{TL} model gives the highest correlation coefficient of $94\%$, but that is not surprising considering the fact that there is a large overlap between the training data used to train it and storm events. This is also the case in \ref{fig:relprob} where we average predictions generated from a pre-trained instance of the \emph{TL} model. Even so the \emph{GP-ARX} model gives a comparable correlation coefficient to \emph{TL}, although the training set of the \emph{GP-ARX} model has no overlap with the storm events which is not the case for \emph{TL}.
+Figure \ref{fig:cc} shows the comparison of correlation coefficients between model predictions and actual $Dst$ values. From the results of \citet{Ji2012}, the \emph{TL} model gives the highest correlation coefficient of $94\%$, but that is not surprising considering the fact that there is a large overlap between the training data used to train it and storm events. Even so the \emph{GP-ARX} model gives a comparable correlation coefficient to \emph{TL}, although the training set of the \emph{GP-ARX} model has no overlap with the storm events which is not the case for \emph{TL}.
 
 \begin{figure}
    \centering
@@ -409,7 +418,7 @@ Figure \ref{fig:cc} shows the comparison of correlation coefficients between mod
    \label{fig:relprob}
 \end{figure}
 
-Figure \ref{fig:deltaDst} shows how the different models compare with respect to accuracy in predicting the peak value of $Dst$ during storm events ($\Delta Dst_{min}$ averaged over all storms). In the context of this metric the \emph{GP-ARX} model gives a $31\%$ improvement over the \emph{TL} model and $40\%$ over the \emph{NM} model. It is trivial to note that by definition, the \emph{Persistence} model ($\hat{Dst}(t) = Dst(t-1)$) will have $\Delta Dst_{min} = 0$ for every storm instance.
+Figure \ref{fig:deltaDst} compares the different models with respect to accuracy in predicting the peak value of $Dst$ during storm events ($\Delta Dst_{min}$ averaged over all storms). In the context of this metric the \emph{GP-ARX} model gives a $32\%$ improvement over the \emph{TL} model and $41\%$ over the \emph{NM} model. It is trivial to note that by definition, the \emph{Persistence} model ($\hat{Dst}(t) = Dst(t-1)$) will have $\Delta Dst_{min} = 0$ for every storm event.
 
 Figure \ref{fig:timingErr} compares the time discrepancy of predicting the storm peak. By definition, the \emph{Persistence} model will always have $\Delta t_{peak} = -1$. The \emph{GP-AR} and \emph{GP-ARX} models give better performance than the other models in terms of timing error in prediction of storm peaks. 
 
@@ -420,12 +429,6 @@ Figure \ref{fig:timingErr} compares the time discrepancy of predicting the storm
          \label{fig:predictions}
 \end{figure}
 
-Figure \ref{fig:relprob} compares the empirical cumulative distribution functions of the absolute value of the relative errors across all storm events in the experiments.  One can see that $95\%$ of the hourly predictions have a relative error smaller than $25\%$ for \emph{GP-ARX}, $50\%$ for \emph{NM} and $60\%$ for \emph{TL}.
-
-In figure \ref{fig:predictions} we show the OSA predictions generated by the \emph{TL}, \emph{NM} and \emph{GP-ARX} models for one event from the list of storms in \citet{Ji2012}. This storm is interesting due to its strength ($Dst_{min} = -289 \ nT$) and the presence of two distinct peaks. In this particular event the \emph{GP-ARX} model approximates the twin peaks as well as the onset and decay phases quite faithfully, contrary the \emph{NM} and \emph{TL} model predictions. The \emph{TL} model recognises the presence of twin peaks but overestimates the second one as well as the decay phase, while the \emph{NM} model is much delayed in the prediction of the initial peak and fails to approximate the time and intensity of the second peak.
-
-As noted in section \ref{sec:inference}, \emph{Gaussian Process} models generate probabilistic predictions instead of point predictions, giving the modeller the ability to specify error bars on the predictions. In figure \ref{fig:predictionswitherrorbar} \emph{OSA} predictions along with lower and upper error bars generated by the \emph{GP-ARX} model are depicted for the event shown in figure \ref{fig:predictions}. The error bars are calculated at one standard deviation on either side of the mean prediction, using the posterior predictive distribution in equations \ref{eq:posteriormean} and \ref{eq:posteriorcov}. We remind that, since the model produces Gaussian output distributions, one standard deviation on either side of the mean corresponds to a confidence interval of $68\%$.
-
 \begin{figure}
    \centering
    \includegraphics[width=\textwidth]{Compare_pred_err_bar.png}
@@ -433,12 +436,13 @@ As noted in section \ref{sec:inference}, \emph{Gaussian Process} models generate
          \label{fig:predictionswitherrorbar}
 \end{figure}
 
-\begin{comment}
-\begin{enumerate}
-    \item Persistence Behavior: It is clear that the \emph{persistence} behavior in the $Dst$ values is very strong i.e. the trivial predictive model $\hat{Dst}(t) = Dst(t-1)$ gives excellent performance. In fact it can be seen in these figures that the \emph{Persistence} model is outperforms every model compared by \citet{Ji2012} in the context of OSA prediction of $Dst$. Therefore any model that is proposed to tackle the OSA prediction problem for $Dst$ must be compared to and show visible gains over the \emph{Persistence} model.
-    \item Assessment of Gaussian Process Models: The results indicate that there are many benefits to be gained by the application of Gaussian Process models for prediction of $Dst$. The \emph{GP-AR} and \emph{GP-ARX} not only outperform the models compared in \citet{Ji2012} but also the \emph{Persistence} model. 
-\end{enumerate}
-\end{comment}
+Figure \ref{fig:relprob} compares the empirical cumulative distribution functions of the absolute value of the relative errors across all storm events in the experiments.  One can see that $95\%$ of the hourly predictions have a relative error smaller than $20\%$ for \emph{GP-ARX}, $50\%$ for \emph{NM} and $60\%$ for \emph{TL}.
+
+In Figure \ref{fig:predictions} we show the OSA predictions generated by the \emph{TL}, \emph{NM} and \emph{GP-ARX} models for one event from the list of storms in \citet{Ji2012}. This storm is interesting due to its strength ($Dst_{min} = -289 \ nT$) and the presence of two distinct peaks. In this particular event the \emph{GP-ARX} model approximates the twin peaks as well as the onset and decay phases quite faithfully, contrary the \emph{NM} and \emph{TL} model predictions. The \emph{TL} model recognises the presence of twin peaks but overestimates the second one as well as the decay phase, while the \emph{NM} model is much delayed in the prediction of the initial peak and fails to approximate the time and intensity of the second peak.
+
+As noted in section \ref{sec:inference}, \emph{Gaussian Process} models generate probabilistic predictions instead of point predictions, giving the modeller the ability to specify error bars on the predictions. In Figure \ref{fig:predictionswitherrorbar}, \emph{OSA} predictions along with lower and upper error bars generated by the \emph{GP-ARX} model are depicted for the event shown in Figure \ref{fig:predictions}. The error bars are calculated at one standard deviation on either side of the mean prediction, using the posterior predictive distribution in equations (\ref{eq:posteriormean}) and (\ref{eq:posteriorcov}). Since the predictive distributions are Gaussian, one standard deviation on either side of the mean corresponds to a confidence interval of $68\%$.
+
+
 
 \section{Conclusions}
 
@@ -446,21 +450,21 @@ In this paper, we proposed two \emph{Gaussian Process} auto-regressive models, \
 
 Our results can be summarized as follows.
    \begin{enumerate}
-      \item \emph{Persistence} model must be central in the model evaluation process in the context of \emph{one step ahead} prediction of the $Dst$ index. It is clear that the \emph{persistence} behavior in the $Dst$ values is very strong i.e. the trivial predictive model $\hat{Dst}(t) = Dst(t-1)$ gives excellent performance according to the metrics chosen. In fact it can be seen in figure \ref{sec:res} that the \emph{Persistence} model outperforms every model compared by \citet{Ji2012} in the context of OSA prediction of $Dst$. Therefore any model that is proposed to tackle the OSA prediction problem for $Dst$ should be compared to the \emph{Persistence} model and show visible gains above it.
+      \item \emph{Persistence} model must be central in the model evaluation process in the context of \emph{one step ahead} prediction of the $Dst$ index. It is clear that the \emph{persistence} behavior in the $Dst$ values is very strong i.e. the trivial predictive model $\hat{Dst}(t) = Dst(t-1)$ gives excellent performance according to the metrics chosen. In fact it can be seen in Figure \ref{fig:rmse} that the \emph{Persistence} model outperforms every model compared by \citet{Ji2012} in the context of OSA prediction of $Dst$. Therefore any model that is proposed to tackle the OSA prediction problem for $Dst$ should be compared to the \emph{Persistence} model and show visible gains above it.
       
       \item \emph{Gaussian Process} AR and ARX models give encouraging benefits in OSA prediction even when compared to the \emph{Persistence} model. Leveraging the strengths of the Bayesian approach, they are able to learn robust predictors from data. 
       
-      If one compares the training sets used by the models, one can appreciate that they are able to learn robust models for prediction with relatively small training and validations sets: the training set contains 250 instances, while the validation set contains 432 instances. On the other hand the \emph{NM} model uses one year (8760 instances) of data to learn the formula outlined in \citet{balikhin:narmax} and the \emph{TL} model uses six years of data (52560 instances) for training. 
+      If one compares the training sets used by all the models, one can appreciate that the models presented here need relatively small training and validations sets: the training set contains 250 instances, while the validation set contains 432 instances. On the other hand the \emph{NM} model uses one year (8760 instances) of data to learn the formula outlined in \citet{balikhin:narmax} and the \emph{TL} model uses six years of data (52560 instances) for training. 
       
       The encouraging results of Gaussian Processes illustrate the strengths of the Bayesian approach to predictive modeling. Since the GP models generate predictive distributions for test data and not just point predictions they lend themselves to the requirements of space weather prediction very well because of the need to generate error bars on predictions.
    \end{enumerate}
    
-\subsection{Future Research Directions}
+%\subsection{Future Research Directions}
 
-Multi-step ahead prediction should be the preferred gold standard with respect to forecasting of geomagnetic indices. Also important is the usage of more informative performance metrics for evaluating and comparing empirical predictive models.
+%Multi-step ahead prediction should be the preferred gold standard with respect to forecasting of geomagnetic indices. Also important is the usage of more informative performance metrics for evaluating and comparing empirical predictive models.
 
 \begin{acknowledgements}
-      We acknowledge use of NASA/GSFC's Space Physics Data Facility's OMNIWeb (or CDAWeb or ftp) service, and OMNI data.
+      We acknowledge use of NASA/GSFC's Space Physics Data Facility's OMNIWeb (or CDAWeb or ftp) service, and OMNI data. We also acknowledge the authors of \citet{JGRA:JGRA16300} for their scientific inputs towards understanding the \emph{TL} model and assistance in access of its generated predictions.
 \end{acknowledgements}
 
 %%    This version assumes use of bibtex with the swsc.bib file being present
@@ -482,514 +486,3 @@ Multi-step ahead prediction should be the preferred gold standard with respect t
 \end{linenumbers}
 
 \end{document}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%
-%%   Below are examples of how to use particular document layout features
-%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%  Examples for figures using graphicx
-%%  A guide "Using Imported Graphics in LaTeX2e"  (Keith Reckdahl)
-%%  is available on a lot of LaTeX public servers or ctan mirrors.
-%%  The file is : epslatex.pdf 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-%_____________________________________________________________
-%                 A figure as large as the width of the column
-%-------------------------------------------------------------
-   \begin{figure}
-   \centering
-   \includegraphics[width=\textwidth]{empty.eps}
-      \caption{Vibrational stability equation of state
-               $S_{\mathrm{vib}}(\lg e, \lg \rho)$.
-               $>0$ means vibrational stability.
-              }
-         \label{FigVibStab}
-   \end{figure}
-%
-%_____________________________________________________________
-%                                    One column rotated figure
-%-------------------------------------------------------------
-   \begin{figure}
-   \centering
-   \includegraphics[angle=-90,width=3cm]{empty.eps}
-      \caption{Vibrational stability equation of state
-               $S_{\mathrm{vib}}(\lg e, \lg \rho)$.
-               $>0$ means vibrational stability.
-              }
-         \label{FigVibStab}
-   \end{figure}
-%
-%_____________________________________________________________
-%                        Figure with caption on the right side 
-%-------------------------------------------------------------
-   \begin{figure}
-   \centering
-   \includegraphics[width=3cm]{empty.eps}
-      \caption{Vibrational stability equation of state
-               $S_{\mathrm{vib}}(\lg e, \lg \rho)$.
-               $>0$ means vibrational stability.
-              }
-         \label{FigVibStab}
-   \end{figure}
-%
-%_____________________________________________________________
-%
-%_____________________________________________________________
-%                                Figure with a new BoundingBox 
-%-------------------------------------------------------------
-   \begin{figure}
-   \centering
-   \includegraphics[bb=10 20 100 300,width=3cm,clip]{empty.eps}
-      \caption{Vibrational stability equation of state
-               $S_{\mathrm{vib}}(\lg e, \lg \rho)$.
-               $>0$ means vibrational stability.
-              }
-         \label{FigVibStab}
-   \end{figure}
-%
-%_____________________________________________________________
-%
-%_____________________________________________________________
-%                                      The "resizebox" command 
-%-------------------------------------------------------------
-   \begin{figure}
-   \resizebox{\textwidth}{!}
-            {\includegraphics[bb=10 20 100 300,clip]{empty.eps}
-      \caption{Vibrational stability equation of state
-               $S_{\mathrm{vib}}(\lg e, \lg \rho)$.
-               $>0$ means vibrational stability.
-              }
-         \label{FigVibStab}
-   \end{figure}
-%
-%______________________________________________________________
-%
-%_____________________________________________________________
-%                                             Simple A&A Table
-%_____________________________________________________________
-%
-\begin{table}
-\caption{Nonlinear Model Results}             % title of Table
-\label{table:1}      % is used to refer this table in the text
-\centering                          % used for centering table
-\begin{tabular}{c c c c}        % centered columns (4 columns)
-\hline\hline                 % inserts double horizontal lines
-HJD & $E$ & Method\#2 & Method\#3 \\    % table heading 
-\hline                        % inserts single horizontal line
-   1 & 50 & $-837$ & 970 \\      % inserting body of the table
-   2 & 47 & 877    & 230 \\
-   3 & 31 & 25     & 415 \\
-   4 & 35 & 144    & 2356 \\
-   5 & 45 & 300    & 556 \\ 
-\hline                                   %inserts single line
-\end{tabular}
-\end{table}
-%
-%_____________________________________________________________
-%                                             Two column Table 
-%_____________________________________________________________
-%
-\begin{table*}
-\caption{Nonlinear Model Results}             
-\label{table:1}      
-\centering          
-\begin{tabular}{c c c c l l l }     % 7 columns 
-\hline\hline       
-                      % To combine 4 columns into a single one 
-HJD & $E$ & Method\#2 & \multicolumn{4}{c}{Method\#3}\\ 
-\hline                    
-   1 & 50 & $-837$ & 970 & 65 & 67 & 78\\  
-   2 & 47 & 877    & 230 & 567& 55 & 78\\
-   3 & 31 & 25     & 415 & 567& 55 & 78\\
-   4 & 35 & 144    & 2356& 567& 55 & 78 \\
-   5 & 45 & 300    & 556 & 567& 55 & 78\\
-\hline                  
-\end{tabular}
-\end{table*}
-%
-%-------------------------------------------------------------
-%                                          Table with notes 
-%-------------------------------------------------------------
-%
-% A single note
-\begin{table}[h]
-\caption{\label{t7}Spectral types and photometry for stars in the
-  region.}
-\centering
-\begin{tabular}{lccc}
-\hline\hline
-Star&Spectral type&RA(J2000)&Dec(J2000)\\
-\hline
-69           &B1\,V     &09 15 54.046 & $-$50 00 26.67\\
-49           &B0.7\,V   &*09 15 54.570& $-$50 00 03.90\\
-LS~1267~(86) &O8\,V     &09 15 52.787&11.07\\
-24.6         &7.58      &1.37 &0.20\\
-\hline
-LS~1262      &B0\,V     &09 15 05.17&11.17\\
-MO 2-119     &B0.5\,V   &09 15 33.7 &11.74\\
-LS~1269      &O8.5\,V   &09 15 56.60&10.85\\
-\hline
-\end{tabular}
-\tablefoot{ The top panel shows likely members of Pismis~11. The second
-panel contains likely members of Alicante~5. The bottom panel
-displays stars outside the clusters.}
-\end{table}
-%
-% More notes
-%
-\begin{table}[h]
-\caption{\label{t7}Spectral types and photometry for stars in the
-  region.}
-\centering
-\begin{tabular}{lccc}
-\hline\hline
-Star&Spectral type&RA(J2000)&Dec(J2000)\\
-\hline
-69           &B1\,V     &09 15 54.046 & $-$50 00 26.67\\
-49           &B0.7\,V   &*09 15 54.570& $-$50 00 03.90\\
-LS~1267~(86) &O8\,V     &09 15 52.787&11.07\tablefootmark{a}\\
-24.6         &7.58\tablefootmark{1}&1.37\tablefootmark{a}   &0.20\tablefootmark{a}\\
-\hline
-LS~1262      &B0\,V     &09 15 05.17&11.17\tablefootmark{b}\\
-MO 2-119     &B0.5\,V   &09 15 33.7 &11.74\tablefootmark{c}\\
-LS~1269      &O8.5\,V   &09 15 56.60&10.85\tablefootmark{d}\\
-\hline
-\end{tabular}
-\tablefoot{ The top panel shows likely members of Pismis~11. The second
-panel contains likely members of Alicante~5. The bottom panel
-displays stars outside the clusters.\\
-\tablefoottext{a}{Photometry for MF13, LS~1267 and HD~80077 from
-Dupont et al.}
-\tablefoottext{b}{Photometry for LS~1262, LS~1269 from
-Durand et al.}
-\tablefoottext{c}{Photometry for MO2-119 from
-Mathieu et al.}
-}
-\end{table}
-%
-%-------------------------------------------------------------
-%                                       Table with references 
-%-------------------------------------------------------------
-%
-\begin{table*}[h]
- \caption[]{\label{nearbylistaa2}List of nearby SNe used in this work.}
-\begin{tabular}{lccc}
- \hline \hline
-  SN name &
-  Epoch &
- Bands &
-  References \\
- &
-  (with respect to $B$ maximum) &
- &
- \\ \hline
-1981B   & 0 & {\it UBV} & 1\\
-1986G   &  $-$3, $-$1, 0, 1, 2 & {\it BV}  & 2\\
-1989B   & $-$5, $-$1, 0, 3, 5 & {\it UBVRI}  & 3, 4\\
-1990N   & 2, 7 & {\it UBVRI}  & 5\\
-1991M   & 3 & {\it VRI}  & 6\\
-\hline
-\noalign{\smallskip}
-\multicolumn{4}{c}{ SNe 91bg-like} \\
-\noalign{\smallskip}
-\hline
-1991bg   & 1, 2 & {\it BVRI}  & 7\\
-1999by   & $-$5, $-$4, $-$3, 3, 4, 5 & {\it UBVRI}  & 8\\
-\hline
-\noalign{\smallskip}
-\multicolumn{4}{c}{ SNe 91T-like} \\
-\noalign{\smallskip}
-\hline
-1991T   & $-$3, 0 & {\it UBVRI}  &  9, 10\\
-2000cx  & $-$3, $-$2, 0, 1, 5 & {\it UBVRI}  & 11\\ %
-\hline
-\end{tabular}
-\tablebib{(1)~\citet{branch83};
-(2) \citet{phillips87}; (3) \citet{barbon90}; (4) \citet{wells94};
-(5) \citet{mazzali93}; (6) \citet{gomez98}; (7) \citet{kirshner93};
-(8) \citet{patat96}; (9) \citet{salvo01}; (10) \citet{branch03};
-(11) \citet{jha99}.
-}
-\end{table}
-%_____________________________________________________________
-%                                 A rotated Table in landscape  
-%  In the preamble, use:   \usepackage{lscape}
-%-------------------------------------------------------------
-\begin{landscape}
-\begin{table*}
-\caption{Summary for ISOCAM sources with mid-IR excess 
-(YSO candidates).}\label{YSOtable}
-\centering
-\begin{tabular}{crrlcl} 
-\hline\hline             
-ISO-L1551 & $F_{6.7}$~[mJy] & $\alpha_{6.7-14.3}$ 
-& YSO type$^{d}$ & Status & Comments\\
-\hline
-  \multicolumn{6}{c}{\it New YSO candidates}\\ % To combine 6 columns into a single one
-\hline
-  1 & 1.56 $\pm$ 0.47 & --    & Class II$^{c}$ & New & Mid\\
-  2 & 0.79:           & 0.97: & Class II ?     & New & \\
-  3 & 4.95 $\pm$ 0.68 & 3.18  & Class II / III & New & \\
-  5 & 1.44 $\pm$ 0.33 & 1.88  & Class II       & New & \\
-\hline
-  \multicolumn{6}{c}{\it Previously known YSOs} \\
-\hline
-  61 & 0.89 $\pm$ 0.58 & 1.77 & Class I & \object{HH 30} & Circumstellar disk\\
-  96 & 38.34 $\pm$ 0.71 & 37.5& Class II& MHO 5          & Spectral type\\
-\hline
-\end{tabular}
-\end{table*}
-\end{landscape}
-%
-%_____________________________________________________________
-%                              Table longer than a single page  
-%  In the preamble, use:              \usepackage{longtable}
-%-------------------------------------------------------------
-%          All long tables have to be placed at the end, after 
-%                                        \end{thebibliography}
-%
-% In the text, at the place where the large table should appear
-% add the command:
-\addtocounter{table}{1}
-% Tables counters will be well numbered.
-%
-\end{thebibliography}
-% If table 2
-\longtab{2}{
-\begin{longtable}{lllrrr}
-\caption{\label{kstars} Sample stars with absolute magnitude}\\
-\hline\hline
-Catalogue& $M_{V}$ & Spectral & Distance & Mode & Count Rate \\
-\hline
-\endfirsthead
-\caption{continued.}\\
-\hline\hline
-Catalogue& $M_{V}$ & Spectral & Distance & Mode & Count Rate \\
-\hline
-\endhead
-\hline
-\endfoot
-%%
-Gl 33    & 6.37 & K2 V & 7.46 & S & 0.043170\\
-Gl 66AB  & 6.26 & K2 V & 8.15 & S & 0.260478\\
-Gl 68    & 5.87 & K1 V & 7.47 & P & 0.026610\\
-         &      &      &      & H & 0.008686\\
-Gl 86 
-\footnote{Source not included in the HRI catalog. See Sect.~5.4.2 for details.}
-         & 5.92 & K0 V & 10.91& S & 0.058230\\
-\end{longtable}
-}% End \longtab
-%
-%_____________________________________________________________
-%                              Table longer than a single page
-%                                             and in landscape 
-%  In the preamble, use:       \usepackage{longtable,lscape}
-%-------------------------------------------------------------
-%          All long tables have to be placed at the end, after
-%                                        \end{thebibliography}
-%
-% In the text, at the place where the large table should appear
-% add the command:                        
-\addtocounter{table}{1} 
-% Tables counters will be well numbered.
-%
-\end{thebibliography}
-% If table 2
-\longtabL{2}{
-\begin{landscape}
-\begin{longtable}{lllrrr}
-\caption{\label{kstars} Sample stars with absolute magnitude}\\
-\hline\hline
-Catalogue& $M_{V}$ & Spectral & Distance & Mode & Count Rate \\
-\hline
-\endfirsthead
-\caption{continued.}\\
-\hline\hline
-Catalogue& $M_{V}$ & Spectral & Distance & Mode & Count Rate \\
-\hline
-\endhead
-\hline
-\endfoot
-%%
-Gl 33    & 6.37 & K2 V & 7.46 & S & 0.043170\\
-Gl 66AB  & 6.26 & K2 V & 8.15 & S & 0.260478\\
-Gl 68    & 5.87 & K1 V & 7.47 & P & 0.026610\\
-         &      &      &      & H & 0.008686\\
-Gl 86
-\footnote{Source not included in the HRI catalog. See Sect.~5.4.2 for details.}
-         & 5.92 & K0 V & 10.91& S & 0.058230\\
-\end{longtable}
-\end{landscape}
-}% End \longtabL
-%
-% Online Material
-%_____________________________________________________________
-%        Online appendices have to be placed at the end, after
-%                                        \end{thebibliography}
-%-------------------------------------------------------------
-\end{thebibliography}
-
-\Online
-
-\begin{appendix} %First online appendix
-\section{Background galaxy number counts and shear noise-levels}
-Because the optical images used in this analysis...
-
-\begin{figure*}
-\centering
-\includegraphics[width=16.4cm,clip]{1787f24.ps}
-\caption{Plotted above...}
-\label{appfig}
-\end{figure*}
-
-Because the optical images...
-\end{appendix}
-
-\begin{appendix} %Second online appendix
-These studies, however, have faced...
-\end{appendix}
-
-\end{document}
-%
-%_____________________________________________________________
-%        Some tables or figures are in the printed version and
-%                      some are only in the electronic version
-%-------------------------------------------------------------
-%
-% Leave all the tables or figures in the text, at their right place 
-% and use the commands \onlfig{}{} and \onltab{}{}. These elements
-% will be automatically placed at the end, in the section
-% Online material.
-
-\documentclass{swsc}
-...
-\begin{document}
-text of the paper...
-\begin{figure*}%f1
-\includegraphics[width=10.9cm]{1787f01.eps}
-\caption{Shown in greyscale is a...}
-\label{cl12301}}
-\end{figure*}
-...
-from the intrinsic ellipticity distribution.
-% Figure 2 available electronically only
-\onlfig{2}{
-\begin{figure*}%f2
-\includegraphics[width=11.6cm]{1787f02.eps}
-\caption {Shown in greyscale...}
-\label{cl1018}
-\end{figure*}
-}
-
-% Figure 3 available electronically only
-\onlfig{3}{
-\begin{figure*}%f3
-\includegraphics[width=11.2cm]{1787f03.eps}
-\caption{Shown in panels...}
-\label{cl1059}
-\end{figure*}
-}
-
-\begin{figure*}%f4
-\includegraphics[width=10.9cm]{1787f04.eps}
-\caption{Shown in greyscale is...}
-\label{cl1232}}
-\end{figure*}
-
-\begin{table}%t1
-\caption{Complexes characterisation.}\label{starbursts}
-\centering
-\begin{tabular}{lccc}
-\hline \hline
-Complex & $F_{60}$ & 8.6 &  No. of  \\
-...
-\hline
-\end{tabular}
-\end{table}
-The second method produces...
-
-% Figure 5 available electronically only
-\onlfig{5}{
-\begin{figure*}%f5
-\includegraphics[width=11.2cm]{1787f05.eps}
-\caption{Shown in panels...}
-\label{cl1238}}
-\end{figure*}
-}
-
-As can be seen, in general the deeper...
-% Table 2 available electronically only
-\onltab{2}{
-\begin{table*}%t2
-\caption{List of the LMC stellar complexes...}\label{Properties}
-\centering
-\begin{tabular}{lccccccccc}
-\hline  \hline
-Stellar & RA & Dec & ...
-...
-\hline
-\end{tabular}
-\end{table*}
-}
-
-% Table 3 available electronically only
-\onltab{3}{
-\begin{table*}%t3
-\caption{List of the derived...}\label{IrasFluxes}
-\centering
-\begin{tabular}{lcccccccccc}
-\hline \hline
-Stellar & $f12$ & $L12$ &...
-...
-\hline
-\end{tabular}
-\end{table*}
-}
-%
-%-------------------------------------------------------------
-%     For the online material, table longer than a single page
-%                 In the preamble, use: \usepackage{longtable}
-%       or for landscape option: \usepackage{longtable,lscape}
-%-------------------------------------------------------------
-\documentclass{swsc}
-\usepackage[varg]{txfonts}
-\usepackage{graphicx}
-\usepackage{longtable}
-
-\begin{document}
-text of the paper
-% Table will be print automatically at the end, in the section Online material.
-\onllongtab{3}{
-\begin{longtable}{lrcrrrrrrrrl}
-\caption{Line data and abundances ...}\\
-\hline
-\hline
-Def & mol & Ion & $\lambda$ & $\chi$ & $\log gf$ & N & e &  rad & $\delta$ & $\delta$ 
-red & References \\
-\hline
-\endfirsthead
-\caption{Continued.} \\
-\hline
-Def & mol & Ion & $\lambda$ & $\chi$ & $\log gf$ & B & C &  rad & $\delta$ & $\delta$ 
-red & References \\
-\hline
-\endhead
-\hline
-\endfoot
-\hline
-\endlastfoot
-A & CH & 1 &3638 & 0.002 & $-$2.551 &  &  &  & $-$150 & 150 &  Jorgensen et al. (1996) \\                    
-\end{longtable}
-}% End onllongtab
-
-% Or for landscape, large table:
-
-\onllongtabL{3}{
-\begin{landscape}
-\begin{longtable}{lrcrrrrrrrrl}
-...
-\end{longtable}
-\end{landscape}
-}% End onllongtabL
-
