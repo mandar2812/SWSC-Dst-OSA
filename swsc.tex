@@ -337,7 +337,7 @@ The time lags chosen for \emph{GP-AR} are $p = 6$ while for \emph{GP-ARX} $p=6$,
     \end{equation}
     \item Correlation coefficient between the predicted and actual value of $Dst$.
     \begin{equation}
-        CC = Cov(Dst, \hat{D}st)/\sqrt{Var(y) Var(\hat{D}st)}
+        CC = Cov(Dst, \hat{D}st)/\sqrt{Var(Dst) Var(\hat{D}st)}
     \end{equation}
     \item The error in prediction of the peak negative value of $Dst$ for a storm event.
     \begin{equation}
@@ -464,7 +464,7 @@ Our results can be summarized as follows.
 %Multi-step ahead prediction should be the preferred gold standard with respect to forecasting of geomagnetic indices. Also important is the usage of more informative performance metrics for evaluating and comparing empirical predictive models.
 
 \begin{acknowledgements}
-      We acknowledge use of NASA/GSFC's Space Physics Data Facility's OMNIWeb (or CDAWeb or ftp) service, and OMNI data. We also acknowledge the authors of \citet{JGRA:JGRA16300} for their scientific inputs towards understanding the \emph{TL} model and assistance in access of its generated predictions.
+      We acknowledge use of NASA/GSFC's Space Physics Data Facility's OMNIWeb (or CDAWeb or ftp) service, and OMNI data. We also acknowledge the authors of \citet{JGRA:JGRA16300} for their scientific inputs towards understanding the \emph{TL} model and assistance in access of its generated predictions. Simon Wing acknowledges supports from CWI and NSF Grant AGS-1058456 and NASA Grants (NNX13AE12G, NNX15AJ01G, NNX16AC39G).   
 \end{acknowledgements}
 
 %%    This version assumes use of bibtex with the swsc.bib file being present
