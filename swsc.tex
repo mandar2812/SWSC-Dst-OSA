@@ -300,8 +300,6 @@ The simplest auto-regressive models for \emph{OSA} prediction of $Dst$ are those
 
 Auto-regressive models can be augmented by including exogenous quantities in the inputs $\mathbf{x}_{t-1}$ at each time step, in order to improve predictive accuracy. $Dst$ gives a measure of ring currents, which are modulated by plasma sheet particle injections into the inner magnetosphere during sub-storms. Studies have shown that the substorm occurrence rate increases with solar wind velocity (high speed streams) \citep{Kissinger2011,Newell2016}. Prolonged southward interplanetary magnetic field (IMF) z-component ($B_z$) is needed for sub-storms to occur \citep{McPherron1986}. An increase in the solar wind electric field, $VB_z$, can increase the dawn-dusk electric field in the magnetotail, which in turn determines the amount of plasma sheet particle that move to the inner magnetosphere \citep{Friedel2001}. Therefore, our exogenous parameters consist of solar wind velocity, IMF $B_z$, and $VB_z$.   
 
-%It is well known that the solar wind and interplanetary magnetic field are important factors that influence the Earth's geomagnetic state (\citet{JGRA:JGRA11775}, \citet{Russell1974}, \citet{JGRA:JGRA17574}).
-
 In this model we choose distinct time lags $p$ and $p_{ex}$ for auto-regressive and exogenous variables respectively. In addition we explicitly include the product $V B_z$ which is a proxy for the electric field, as an input.
     
 \begin{eqnarray*}
@@ -459,9 +457,6 @@ Our results can be summarized as follows.
       The encouraging results of Gaussian Processes illustrate the strengths of the Bayesian approach to predictive modeling. Since the GP models generate predictive distributions for test data and not just point predictions they lend themselves to the requirements of space weather prediction very well because of the need to generate error bars on predictions.
    \end{enumerate}
    
-%\subsection{Future Research Directions}
-
-%Multi-step ahead prediction should be the preferred gold standard with respect to forecasting of geomagnetic indices. Also important is the usage of more informative performance metrics for evaluating and comparing empirical predictive models.
 
 \begin{acknowledgements}
       We acknowledge use of NASA/GSFC's Space Physics Data Facility's OMNIWeb (or CDAWeb or ftp) service, and OMNI data. We also acknowledge the authors of \citet{JGRA:JGRA16300} for their scientific inputs towards understanding the \emph{TL} model and assistance in access of its generated predictions. Simon Wing acknowledges supports from CWI and NSF Grant AGS-1058456 and NASA Grants (NNX13AE12G, NNX15AJ01G, NNX16AC39G).   
