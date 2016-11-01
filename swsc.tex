@@ -311,11 +311,15 @@ In this model we choose distinct time lags $p$ and $p_{ex}$ for auto-regressive 
 
 \section{Model Training and Validation}
 
-Before running performance bench marks for \emph{OSA} $Dst$ prediction on the storm events in \cite{Ji2012}, training and model selection of \emph{GP-AR} and \emph{GP-ARX} models on independent data sets must be performed. For this purpose we choose segments 00:00 1 January 2008 - 10:00 11 January 2008 for training and 00:00 15 November 2014 - 23:00 1 December 2014 for model selection.
+Before running performance bench marks for \emph{OSA} $Dst$ prediction on the storm events in \cite{Ji2012}, training and model selection of \emph{GP-AR} and \emph{GP-ARX} models on independent data sets must be performed. For this purpose we choose segments 00:00 1 January 2008 - 10:00 11 January 2008 for training and 00:00 15 November 2014 - 23:00 1 December 2014 for model selection. 
+
+Although the training and model selection data sets both do not have a geomagnetic storm in them, this would not degrade the performance of \emph{GP-AR} and \emph{GP-ARX} because the linear polynomial kernel describes a non stationary and self similar Gaussian Process. This implies that for two events where the time histories of $Dst$, $V$ and $B_z$ are not close to each other but can be expressed as a diagonal rescaling of time histories observed in the training data, the predictive distribution is a linearly rescaled version of the training data $Dst$ distribution. 
+
+The computational complexity of calculation of the predictive distribution is $O(N^3)$ as per section \label{sec:inference} this can limit the size of the covariance matrix constructed from the training data. Note that this computation overhead is paid for every unique assignment to the model hyper-parameters.
 
 Model selection of \emph{GP-AR} and \emph{GP-ARX} is performed by grid search methodology and the root mean square error (\emph{RMSE}) on the validation set is used to select the values of the model hyper-parameters. In the experiments performed the best performing values of the hyper-parameters outputted by the grid search routine are $\sigma = 0.45$ for the \emph{GP-ARX} and $\sigma = 1.173$ for \emph{GP-AR}. 
 
-The time lags chosen for \emph{GP-AR} are $p = 6$ while for \emph{GP-ARX} $p=6$, $p_{ex} = 1$ are arrived by experimenting with values starting from one and choosing the value of $p$ yielding best performance on the 63 events in the bench mark.   
+The time lags chosen for \emph{GP-AR} are $p = 6$ while for \emph{GP-ARX} $p=6$, $p_{ex} = 1$ are arrived by experimenting with values starting from one and choosing the value of $p$ yielding best performance on the 63 events in the bench mark. We do not feel that this approach for choosing the time lags leads to bias towards models which only perform well on the data set of \citet{Ji2012} because Gaussian Processes are not easily susceptible to overfitting for situations when the number of model hyper-parameters is small or leave one out cross-validation is not performed.
 
 \begin{figure}
    \centering
@@ -395,8 +399,6 @@ With respect to the \emph{TL} model one important caveat must be noted. The trai
    \end{figure}
 
 \section{Results} \label{sec:res}
-%%  This two-panel figure was inserted by JFW to demonstrate the subfigure and epstopdf packages
-
 
 Figures \ref{fig:rmse}, \ref{fig:cc}, \ref{fig:deltaDst} and \ref{fig:timingErr} compare the performance of \emph{GP-AR}, \emph{GP-ARX} and the \emph{Persistence} model with the existing results of \citet{Ji2012}. Figure \ref{fig:rmse} compares the average RMSE of the predictions over the list of 63 storms. One can see that the \emph{GP-ARX} model gives an improvement of approximately $40\%$ in RMSE with respect to the \emph{TL} model and $62\%$ improvement with respect to the \emph{NM} model. It can also be seen that the \emph{Persistence} model gives better \emph{RMSE} performance than the models compared in \citet{Ji2012}.
 
