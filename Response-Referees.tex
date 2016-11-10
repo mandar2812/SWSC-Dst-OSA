@@ -64,7 +64,10 @@ Additions were made in lines $229-234$ \blockquote{Although the training and mod
 
 
 
-Additions were made in lines $246-253$ in section 4. \blockquote{The time lags chosen for \emph{GP-AR} are $p = 6$ while for \emph{GP-ARX} $p=6$, $p_{ex} = 1$ are arrived by experimenting with values starting from one and choosing the value of $p$ yielding best performance on a separate set of storm events during the periods $1995-1997$ and $2011-2014$. Figures \ref{fig:prmse} and \ref{fig:pcorr} show the performance of \emph{GP-ARX} models having values of $p={3,4,5,6,7}$. We observe that the median \emph{RMSE} and \emph{CC} degrade slightly from $p = 3$ to $p = 7$ and models with $p = 6$ have a much smaller variance in performance making them more robust to outliers. The choice of $p = 6$ thus gives a good trade off between model robustness and complexity. 
+Additions were made in lines $246-253$ in section 4. \blockquote{The time lags chosen for \emph{GP-AR} are $p = 6$ while for \emph{GP-ARX} they are $p=6$, $p_{ex} = 1$. These values are arrived at by building \emph{GP-AR} and \emph{GP-ARX} models for different values of $p$ and choosing the model yielding the best performance on a set of storm events during the periods $1995-1997$ and $2011-2014$. 
+
+Box plots \ref{fig:prmse} and \ref{fig:pcorr} show the performance of \emph{GP-ARX} models having values of $p={3,4,5,6,7}$. We observe that the median \emph{RMSE} and \emph{CC} degrade slightly from $p = 3$ to $p = 7$ and models with $p = 6$ have a much smaller variance in performance making them more robust to outliers. The choice of $p = 6$ thus gives a good trade off between model robustness and complexity. 
+
 
 We feel that this approach for choosing the time lags does not lead to bias towards models which only perform well on the data set of \citet{Ji2012} because the storms used have no overlap with it. Also, Gaussian Processes are not easily susceptible to overfitting when the number of model hyper-parameters is small or leave one out cross-validation is not performed.
 }
