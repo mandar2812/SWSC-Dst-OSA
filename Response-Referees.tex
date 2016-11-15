@@ -33,7 +33,9 @@ It is certainly true that Gaussian Process models become prohibitively expensive
 
 However, a size of 250 is still very much below the computational limits of the method and, in our case, it has been decided by studying the performance of the models for increasing training sets. We have noticed that using sets with more than 250 values does not increase the overall performance.
 
-We have made this point explicit on lines $235-241$: \blockquote{The computational complexity of calculation of the predictive distribution is $O(N^3)$ as per section \ref{sec:inference}, this can limit the size of the covariance matrix constructed from the training data. Note that this computation overhead is paid for every unique assignment to the model hyper-parameters. However, our chosen training set has a size of 250 which is still very much below the computational limits of the method and in our case, it has been decided by studying the performance of the models for increasing training sets. We have noticed that using training sets with more than 250 values does not increase the overall performance in \emph{OSA} prediction of Dst.
+We have made this point explicit on lines $235-243$: \blockquote{The computational complexity of calculation of the predictive distribution is $O(N^3)$, as discussed in section 2.1. This can limit the size of the covariance matrix constructed from the training data. Note that this computation overhead is paid for every unique assignment to the model hyper-parameters. However, our chosen training set has a size of 250 which is still very much below the computational limits of the method and in our case. Solving equation 13 on a laptop computer takes less than a second for the training set considered in our analysis. 
+
+The size of the training set has been decided by studying the performance of the models for increasing training sets. We have noticed that using training sets with more than 250 values does not increase the overall performance in \emph{OSA} prediction of Dst. 
 }
 
 \newpage
@@ -60,23 +62,27 @@ Additions were made in lines $229-234$ \blockquote{Although the training and mod
          \label{fig:pcorr}
  \end{figure}
 
+\newpage
 \item \emph{The time lag parameters 'p' for the two models were selected by comparing the model to the 63 storm events. Shouldn't the parameter have been selected using an independent set of storms instead in order not to favor these new models against the other models?}
 
 
 
-Additions were made in lines $246-253$ in section 4. \blockquote{The time lags chosen for \emph{GP-AR} are $p = 6$ while for \emph{GP-ARX} they are $p=6$, $p_{ex} = 1$. These values are arrived at by building \emph{GP-AR} and \emph{GP-ARX} models for different values of $p$ and choosing the model yielding the best performance on a set of storm events during the periods $1995-1997$ and $2011-2014$. 
+Additions were made in lines $248-262$ in section 4. \blockquote{The time lags chosen for \emph{GP-AR} are $p = 6$ while for \emph{GP-ARX} they are $p=6$, $p_{ex} = 1$. These values are arrived at by building \emph{GP-AR} and \emph{GP-ARX} models for different values of $p$ and choosing the model yielding the best performance on a set of storm events during the periods $1995-1997$ and $2011-2014$. 
 
-Box plots \ref{fig:prmse} and \ref{fig:pcorr} show the performance of \emph{GP-ARX} models having values of $p={3,4,5,6,7}$. We observe that the median \emph{RMSE} and \emph{CC} degrade slightly from $p = 3$ to $p = 7$ and models with $p = 6$ have a much smaller variance in performance making them more robust to outliers. The choice of $p = 6$ thus gives a good trade off between model robustness and complexity. 
+Box plots \ref{fig:prmse} and \ref{fig:pcorr} show the performance of \emph{GP-ARX} models having values of $p={3,4,5,6,7}$. In these figures lower and upper ends of the vertical lines denote the minimum and maximum respectively, the horizontal line inside a box represents the median, lower and upper ends of a box represent the first and third quartile respectively while dots if present represent outlier points. 
 
+We observe that the median \emph{RMSE} and \emph{CC} degrade slightly from $p = 3$ to $p = 7$ and models with $p = 6$ have a much smaller variance in performance making them more robust to outliers. The choice of $p = 6$ thus gives a good trade off between model robustness and complexity. 
 
-We feel that this approach for choosing the time lags does not lead to bias towards models which only perform well on the data set of \citet{Ji2012} because the storms used have no overlap with it. Also, Gaussian Processes are not easily susceptible to overfitting when the number of model hyper-parameters is small or leave one out cross-validation is not performed.
+This approach for choosing the time lags does not lead to bias towards models which only perform well on the data set of \citet{Ji2012} because the storms used to choose the model order have no overlap with it. Moreover, Gaussian Processes are not easily susceptible to overfitting when the number of model hyper-parameters is small.
 }
 
 \item \emph{Rastaetter et al. please correct the first initial in "A. Glocer".} 
 
-Corrections made in lines $437-439$
+Corrections made in lines $452-454$
 
 \end{enumerate}
+
+\newpage
 \textbf{Referee \#9}: 
 
 \begin{enumerate}
@@ -87,8 +93,8 @@ However, we agree that that statement is confusing and that it could lead to the
 
 The first argument is that we do not see any reason or benefit for comparing the models in the way the referee suggests they were compared, that is using the predicted $Dst$ values instead of the real and available $Dst$ data. It is obvious that by doing so the performance of the models would degrade, in ways that are difficult to foresee. The main and only purpose of the Ji et al. paper, however, is to compare the performance of different models. Why would one like to compare less-than-optimal results? That paper would be completely flawed if the authors had made what the referee suggests. 
 
-We realize that the first argument is simply based on scientific common sense, and that the referee might not be persuaded. The following is a more scientific and indisputable proof that the referee's suggestion is wrong.
-In the Ji et al. paper, NARMAX and TL are the most performing models. Since the referee's suggestion is irrelevant for TL (because it does not use $Dst$ by construction), we have tested it on NARMAX.
+We realize that this argument is simply based on scientific common sense, and that the referee might not be persuaded. The following is a more scientific and indisputable proof that the referee's suggestion is wrong.
+In the Ji et al. paper, NARMAX and TL are the best performing models. Since the referee's suggestion is irrelevant for TL (because it does not use $Dst$ by construction), we have tested it on NARMAX.
 We have taken the NARMAX model as specified in Boynton et al. (2011) and re-tested it on the 63 storms, by using the previously predicted $Dst$ values instead of the actual $Dst$ data. This model is denoted as \emph{NM Variant} in
 Figures \ref{fig:rmseNew} and \ref{fig:ccNew}. Here, we show the Root Mean Square Error and the Correlation Coefficient (same as Figure 2b and 2a in Ji et al. (2012)). By using predicted $Dst$, the RMSE changes from 23.4 to 54.8 and the CC goes from 0.87 to 0.04 (which means no-correlation). 
 Clearly, the values reported in that paper could not have been obtained in the way the referee suggests. 
